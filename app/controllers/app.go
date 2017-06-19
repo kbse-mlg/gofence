@@ -9,5 +9,7 @@ type App struct {
 }
 
 func (c App) Index() revel.Result {
-	return c.Render()
+	moreStyles := []string{"css/leaflet.css"}
+	moreScripts := []string{"js/leaflet.js"}
+	return c.Render(moreScripts, moreStyles)
 }
