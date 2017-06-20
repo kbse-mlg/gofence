@@ -11,5 +11,6 @@ type App struct {
 func (c App) Index() revel.Result {
 	moreStyles := []string{"css/leaflet.css"}
 	moreScripts := []string{"js/leaflet.js"}
-	return c.Render(moreScripts, moreStyles)
+	IsDashboard := true
+	return c.Render(moreScripts, moreStyles, IsDashboard)
 }

@@ -34,7 +34,7 @@
 <!-- header logo: style can be found in header-->
 <header class="header">
     <nav class="navbar navbar-static-top" role="navigation">
-        <a href="index.html" class="logo">
+        <a href="#" class="logo">
             <!-- Add the class icon to your logo image or logo icon to add the margining -->
             <img src="public/img/logo.png" alt="logo"/>
         </a>
@@ -225,11 +225,30 @@
                     </div>
                 </div>
                 <ul class="navigation">
-                    <li>
-                        <a href="#">
+                    <li {{if .IsDashboard}}class="active"{{end}}>
+                        <a href="/">
                             <i class="menu-icon ti-desktop"></i>
                             <span class="mm-text ">Dashboard</span>
                         </a>
+                    </li>
+                    <li class="menu-dropdown">
+                        <a href="#">
+                            <i class="menu-icon ti-widget"></i>
+                            <span>Data</span>
+                            <span class="fa arrow"></span>
+                        </a>
+                        <ul class="sub-menu collapse in" aria-expanded="true">
+                            <li {{if .IsAreas}}class="active"{{end}}>
+                                <a href="/areas">
+                                    <i class=" menu-icon fa fa-fw ti-widgetized"></i>Area
+                                </a>
+                            </li>
+                            <li {{if .IsObjects}}class="active"{{end}}>
+                                <a href="/objects">
+                                    <i class=" menu-icon fa fa-fw ti-widget-alt"></i>Object
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
                 <!-- / .navigation -->
