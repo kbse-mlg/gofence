@@ -9,8 +9,10 @@ type App struct {
 }
 
 func (c App) Index() revel.Result {
-	moreStyles := []string{"css/leaflet.css"}
-	moreScripts := []string{"js/leaflet.js"}
+	moreScripts := []string{
+		"//maps.google.com/maps/api/js?sensor=true",
+		"/public/js/gmap.js",
+	}
 	IsDashboard := true
-	return c.Render(moreScripts, moreStyles, IsDashboard)
+	return c.Render(moreScripts, IsDashboard)
 }

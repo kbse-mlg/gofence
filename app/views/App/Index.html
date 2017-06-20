@@ -23,10 +23,6 @@
                             <h4 class="panel-title">
                                 <i class="ti-map-alt"></i> Location
                             </h4>
-                            <span class="pull-right">
-                                <i class="fa fa-fw ti-angle-up clickable"></i>
-                                    <i class="fa fa-fw ti-close removepanel clickable"></i>
-                                </span>
                         </div>
                         <div class="panel-body">
                             <div id="gmapid" class="gmap" style="max-height: 600px; height:600px"></div>
@@ -37,11 +33,35 @@
         </section>
     </aside>
     <script type='text/javascript'>
-      var map = L.map('gmapid').setView([51.505, -0.09], 13);
-
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
+        $(document).ready(function(){
+            map = new GMaps({
+                div: '#gmapid',
+                lat: -12.043333,
+                lng: -77.028333
+            });
+            var path=[];
+            var p = [[-12.040397656836609,-77.03373871559225],[-12.040248585302038,-77.03993927003302],[-12.050047116528843,-77.02448169303511],[-12.044804866577001,-77.02154422636042]];
+            for(var i in p){
+                latlng = new google.maps.LatLng(p[i][0], p[i][1]);
+                path.push(latlng);
+            }
+            polygon = map.drawPolygon({
+                paths: path,
+                strokeColor: '#BBD8E9',
+                strokeOpacity: 1,
+                strokeWeight: 3,
+                fillColor: '#BBD8E9',
+                fillOpacity: 0.6
+            });
+            map.addMarker({
+                lat: -12.043333,
+                lng: -77.028333,
+                draggable: true,
+                fences: [polygon],
+                outside: function(m, f){
+                alert('This marker has been moved outside of its fence');
+                }
+            });
+        });
     </script>
 {{template "footer.html" .}}
