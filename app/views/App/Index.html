@@ -63,21 +63,5 @@
                 }
             });
         });
-
-        
-
-        // Create a socket
-        var socket = new WebSocket('ws://'+window.location.host+'/websocket/hook/set?name=oke&geojson=ok')
-        // Message received on the socket
-        socket.onmessage = function(event) {
-            console.log(JSON.parse(event.data))
-        }
-        socket.onopen = function(){
-            var data = {
-                cmd:"position",
-                data:"oke bos"
-            };
-            socket.send(JSON.stringify(data));
-        }
     </script>
 {{template "footer.html" .}}
