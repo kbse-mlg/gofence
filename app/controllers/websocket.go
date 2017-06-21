@@ -1,23 +1,32 @@
 package controllers
 
 import (
+	"encoding/json"
+
 	"github.com/revel/revel"
 	"golang.org/x/net/websocket"
 
-	"github.com/kbse-mlg/gofence/app/geofence/geofence"
+	"github.com/kbse-mlg/gofence/app/geofence"
 )
 
 type WebSocket struct {
 	*revel.Controller
 }
 
-func (c WebSocket) RoomSocket(user string, ws *websocket.Conn) revel.Result {
+type ClientData struct {
+	Command string  `json:"cmd"`
+	Data    string  `json:"data"`
+	Long    float64 `json:"long"`
+	Lat     float64 `json:"lat"`
+}
+
+func (c WebSocket) SetHook(name, geojson string, ws *websocket.Conn) revel.Result {
 	// Join the room.
 	subscription := geofence.Subscribe()
 	defer subscription.Cancel()
 
-	chatroom.Join(user)
-	defer chatroom.Leave(user)
+	geofence.Join(name)
+	defer geofence.Leave(name)
 
 	// Send down the archive.
 	for _, event := range subscription.Archive {
@@ -55,10 +64,23 @@ func (c WebSocket) RoomSocket(user string, ws *websocket.Conn) revel.Result {
 			if !ok {
 				return nil
 			}
+			var m ClientData
+			err := json.Unmarshal([]byte(msg), &m)
+			if err == nil {
+				// put error message
+			}
 
-			// Otherwise, say something.
-			chatroom.Say(user, msg)
+			doSomething(&m)
 		}
 	}
 	return nil
+}
+
+func doSomething(clientData *ClientData) {
+	switch cmd := clientData.Command; cmd {
+	case "position":
+		geofence.Position(clientData.Data, 10, 10)
+	default:
+		geofence.Position("lalalala", 10, 10)
+	}
 }

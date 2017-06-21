@@ -11,6 +11,9 @@ GET     /                                        App.Index
 GET     /areas                                   Area.Index
 GET     /objects                                 Object.Index
 
+# WebSocket demo
+WS      /websocket/hook/set                     WebSocket.SetHook
+
 # Ignore favicon requests
 GET     /favicon.ico                            404
 

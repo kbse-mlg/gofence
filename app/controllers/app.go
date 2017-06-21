@@ -10,7 +10,7 @@ type App struct {
 
 func (c App) Index() revel.Result {
 	moreScripts := []string{
-		"//maps.google.com/maps/api/js?sensor=true",
+		"https://maps.googleapis.com/maps/api/js?key=AIzaSyBJFNacrQSkWIUsbZjLw4wHo0yyF9DDrgE",
 		"/public/js/gmap.js",
 	}
 	IsDashboard := true

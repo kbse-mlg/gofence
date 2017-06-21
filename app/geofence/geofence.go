@@ -35,6 +35,14 @@ func Subscribe() Subscription {
 	return <-resp
 }
 
+func Join(name string) {
+	publish <- newEvent("join", name, "", 0, 0)
+}
+
+func Leave(name string) {
+	publish <- newEvent("leave", name, "", 0, 0)
+}
+
 func Sethook(name, geojson string) {
 	publish <- newEvent("create", name, geojson, 0, 0)
 }
