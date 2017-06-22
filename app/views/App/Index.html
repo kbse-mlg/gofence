@@ -34,34 +34,94 @@
     </aside>
     <script type='text/javascript'>
         $(document).ready(function(){
-            map = new GMaps({
-                div: '#gmapid',
-                lat: -12.043333,
-                lng: -77.028333
+           var geojsonSample = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                    "type": "Feature",
+                    "properties": {
+                        "color":"red"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                        [
+                            [
+                            101.67458295822144,
+                            3.1290962786081646
+                            ],
+                            [
+                            101.67694330215454,
+                            3.127125114155911
+                            ],
+                            [
+                            101.67750120162964,
+                            3.1273822227728822
+                            ],
+                            [
+                            101.6785740852356,
+                            3.1284106566103684
+                            ],
+                            [
+                            101.67887449264526,
+                            3.128796319039309
+                            ],
+                            [
+                            101.67833805084227,
+                            3.129267684037543
+                            ],
+                            [
+                            101.67923927307129,
+                            3.1302532647123797
+                            ],
+                            [
+                            101.67709350585938,
+                            3.13222442328034
+                            ],
+                            [
+                            101.67563438415527,
+                            3.130638926463226
+                            ],
+                            [
+                            101.67522668838501,
+                            3.1299747311373816
+                            ],
+                            [
+                            101.67458295822144,
+                            3.1290962786081646
+                            ]
+                        ]
+                        ]
+                    }
+                    }
+                ]
+            };
+
+
+            // initialize the map on the "map" div with a given center and zoom
+            var map = L.map('gmapid', {
+                center: [3.1290962786081646, 101.67658295822144],
+                zoom: 17
             });
-            var path=[];
-            var p = [[-12.040397656836609,-77.03373871559225],[-12.040248585302038,-77.03993927003302],[-12.050047116528843,-77.02448169303511],[-12.044804866577001,-77.02154422636042]];
-            for(var i in p){
-                latlng = new google.maps.LatLng(p[i][0], p[i][1]);
-                path.push(latlng);
-            }
-            polygon = map.drawPolygon({
-                paths: path,
-                strokeColor: '#BBD8E9',
-                strokeOpacity: 1,
-                strokeWeight: 3,
-                fillColor: '#BBD8E9',
-                fillOpacity: 0.6
-            });
-            map.addMarker({
-                lat: -12.043333,
-                lng: -77.028333,
-                draggable: true,
-                fences: [polygon],
-                outside: function(m, f){
-                alert('This marker has been moved outside of its fence');
-                }
-            });
+
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                maxZoom: 18,
+                id: 'mapbox.streets',
+                accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+            }).addTo(map);
+
+            var gsonLayer = L.geoJSON();
+            L.geoJSON(geojsonSample, {
+                    style: function (feature) {
+                        return {color: feature.properties.color};
+                    }
+                }).bindPopup(function (layer) {
+                    return layer.feature.properties.description;
+                }).addTo(map);
         });
     </script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
+   integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+   crossorigin=""></script>
 {{template "footer.html" .}}
