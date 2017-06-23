@@ -55,6 +55,10 @@ func Position(name string, long, lat float64) {
 	publish <- newEvent("position", name, "", long, lat)
 }
 
+func Result(name, data string) {
+	publish <- newEvent("result", name, data, 0, 0)
+}
+
 const archiveSize = 10
 
 var (
