@@ -10,7 +10,8 @@ import (
 type Object struct {
 	ObjectID int
 	Name     string
-	Geodata  string
+	Long     float64
+	Lat      float64
 	Type     int
 }
 
@@ -26,9 +27,5 @@ func (obj *Object) Validate(v *revel.Validation) {
 		revel.MaxSize{15},
 		revel.MinSize{4},
 		revel.Match{nameRegex},
-	)
-
-	v.Check(obj.Geodata,
-		revel.Required{},
 	)
 }
