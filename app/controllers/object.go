@@ -1,16 +1,29 @@
 package controllers
 
 import (
+	"github.com/kbse-mlg/gofence/app/models"
 	"github.com/revel/revel"
 )
 
 type Object struct {
-	*revel.Controller
+	App
 }
 
 func (c Object) Index() revel.Result {
 	moreStyles := []string{"css/leaflet.css"}
 	moreScripts := []string{"js/leaflet.js"}
 	IsObjects := true
-	return c.Render(moreScripts, moreStyles, IsObjects)
+
+	results, err := c.Txn.Select(models.Object{},
+		`select * from "Object"`)
+	if err != nil {
+		panic(err)
+	}
+
+	var objects []*models.Object
+	for _, r := range results {
+		b := r.(*models.Object)
+		objects = append(objects, b)
+	}
+	return c.Render(moreScripts, moreStyles, IsObjects, objects)
 }
