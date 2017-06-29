@@ -70,16 +70,21 @@ func (c WebSocket) SetHook(name, geojson string, ws *websocket.Conn) revel.Resul
 				// put error message
 			}
 
-			doSomething(&m)
+			doProcess(&m)
 		}
 	}
 	return nil
 }
 
-func doSomething(clientData *ClientData) {
+func doProcess(clientData *ClientData) {
 	switch cmd := clientData.Command; cmd {
-	case "position":
+	case geofence.POSITION:
 		geofence.Position(clientData.Data, 10, 10)
+	case geofence.SETHOOK:
+	case geofence.DELHOOK:
+	case geofence.JOIN:
+	case geofence.LEAVE:
+	case geofence.RESULT:
 	default:
 		geofence.Position("lalalala", 10, 10)
 	}

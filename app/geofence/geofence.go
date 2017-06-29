@@ -5,6 +5,28 @@ import (
 	"time"
 )
 
+const (
+	// JOIN subscribed event
+	JOIN = "join"
+
+	// LEAVE end subscribe
+	LEAVE = "leave"
+
+	// POSITION update event name
+	POSITION = "position"
+
+	// SETHOOK to register webhook to pubsub server using tile38
+	SETHOOK = "sethook"
+
+	// DELHOOK to delete assigned webhook
+	DELHOOK = "delhook"
+
+	// RESULT get the result of query
+	RESULT = "result"
+)
+
+// Event is a type for
+//
 type Event struct {
 	Type      string // "create" "destroy" "position", "list", or "object"
 	Name      string
@@ -36,27 +58,27 @@ func Subscribe() Subscription {
 }
 
 func Join(name string) {
-	publish <- newEvent("join", name, "", 0, 0)
+	publish <- newEvent(JOIN, name, "", 0, 0)
 }
 
 func Leave(name string) {
-	publish <- newEvent("leave", name, "", 0, 0)
+	publish <- newEvent(LEAVE, name, "", 0, 0)
 }
 
 func Sethook(name, geojson string) {
-	publish <- newEvent("create", name, geojson, 0, 0)
+	publish <- newEvent(SETHOOK, name, geojson, 0, 0)
 }
 
 func DeleteHook(name string) {
-	publish <- newEvent("destroy", name, "", 0, 0)
+	publish <- newEvent(DELHOOK, name, "", 0, 0)
 }
 
 func Position(name string, long, lat float64) {
-	publish <- newEvent("position", name, "", long, lat)
+	publish <- newEvent(POSITION, name, "", long, lat)
 }
 
 func Result(name, data string) {
-	publish <- newEvent("result", name, data, 0, 0)
+	publish <- newEvent(RESULT, name, data, 0, 0)
 }
 
 const archiveSize = 10
