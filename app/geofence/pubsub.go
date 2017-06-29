@@ -23,23 +23,27 @@ func init() {
 }
 
 func pubSubRedis() {
-	c, err := redis.Dial("tcp", ":6379")
-	if err != nil {
-		log.Fatalf("Could not connect: %v\n", err)
-	}
-	log.Println("Oke")
-	defer c.Close()
-	psc := redis.PubSubConn{Conn: c}
-	psc.PSubscribe("fence.*")
 	for {
-		switch v := psc.Receive().(type) {
-		case redis.PMessage:
-			log.Printf("%s - %s: message: %s\n", v.Pattern, v.Channel, v.Data)
-			Result(v.Channel, string(v.Data[:len(v.Data)]))
-		case redis.Subscription:
-			log.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
-		case error:
-			return
+		c, err := redis.Dial("tcp", ":6379")
+		if err != nil {
+			log.Fatalf("Could not connect: %v\n", err)
 		}
+		log.Println("Oke")
+		defer c.Close()
+		psc := redis.PubSubConn{Conn: c}
+		psc.PSubscribe("fence.*")
+
+		for c.Err() == nil {
+			switch v := psc.Receive().(type) {
+			case redis.PMessage:
+				log.Printf("%s - %s: message: %s\n", v.Pattern, v.Channel, v.Data)
+				Result(v.Channel, string(v.Data[:len(v.Data)]))
+			case redis.Subscription:
+				log.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
+			case error:
+				return
+			}
+		}
+		c.Close()
 	}
 }
