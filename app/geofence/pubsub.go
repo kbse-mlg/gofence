@@ -30,11 +30,11 @@ func pubSubRedis() {
 	log.Println("Oke")
 	defer c.Close()
 	psc := redis.PubSubConn{Conn: c}
-	psc.Subscribe("warehouse")
+	psc.PSubscribe("fence.*")
 	for {
 		switch v := psc.Receive().(type) {
-		case redis.Message:
-			log.Printf("%s: message: %s\n", v.Channel, v.Data)
+		case redis.PMessage:
+			log.Printf("%s - %s: message: %s\n", v.Pattern, v.Channel, v.Data)
 			Result(v.Channel, string(v.Data[:len(v.Data)]))
 		case redis.Subscription:
 			log.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
