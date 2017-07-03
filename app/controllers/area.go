@@ -62,6 +62,7 @@ func (c Area) ListJson() revel.Result {
 	if page == 0 {
 		page = 1
 	}
+	nextPage := page + 1
 
 	if size == 0 {
 		size = 10
@@ -84,6 +85,7 @@ func (c Area) ListJson() revel.Result {
 		Areas:         areas,
 		Size:          size,
 		Page:          page,
+		NextPage:      nextPage,
 	}
 
 	return c.RenderJSON(result)

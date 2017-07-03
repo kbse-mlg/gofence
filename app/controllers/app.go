@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/kbse-mlg/gofence/app/models"
 	"github.com/revel/revel"
 )
 
@@ -17,5 +18,18 @@ func (c App) Index() revel.Result {
 		"https://unpkg.com/leaflet@1.0.3/dist/leaflet.css",
 	}
 	IsDashboard := true
-	return c.Render(moreScripts, moreStyles, IsDashboard)
+
+	results, err := c.Txn.Select(models.Object{},
+		`select * from "Object"`)
+	if err != nil {
+		panic(err)
+	}
+
+	var objects []*models.Object
+	for _, r := range results {
+		b := r.(*models.Object)
+		objects = append(objects, b)
+	}
+
+	return c.Render(moreScripts, moreStyles, IsDashboard, objects)
 }

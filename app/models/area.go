@@ -40,4 +40,5 @@ type AreaCollection struct {
 	CurrentSearch string
 	Size          int64
 	Page          int64
+	NextPage      int64
 }

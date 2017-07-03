@@ -23,9 +23,49 @@
                             <h4 class="panel-title">
                                 <i class="ti-map-alt"></i> Location
                             </h4>
+                            <span class="pull-right">
+                                <i class="fa fa-fw ti-angle-up clickable"></i>
+                            </span>
                         </div>
                         <div class="panel-body">
                             <div id="gmapid" class="gmap" style="max-height: 600px; height:600px"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="panel ">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <i class="ti-layout-cta-left"></i>&nbsp;Object Tracker
+                            </h3>
+                            <span class="pull-right">
+                                <i class="fa fa-fw ti-angle-up clickable"></i>
+                                <i class="fa fa-fw ti-close removepanel clickable"></i>
+                            </span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Group</th>
+                                        <th>Long</th>
+                                        <th>Lat</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                     {{range .objects}}
+                                      <tr>
+                                          <td>{{.Name}}</td>
+                                          <td>{{.Group}}</td>
+                                          <td>{{.Long}}</td>
+                                          <td>{{.Lat}}</td>
+                                      </tr>
+                                      {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -47,8 +87,23 @@
                 id: 'mapbox.streets',
                 accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
             }).addTo(map);
+
+            function whenClicked(e) {
+                // e = event
+                console.log(e);
+                // You can make your ajax call declaration here
+                //$.ajax(... 
+            }
+
+            function onEachFeature(feature, layer) {
+                //bind click
+                layer.on({
+                    click: whenClicked
+                });
+            }
             
             var layers = [];
+            var markers = [];
 
             $.get( "/api/v1/area", function( data ) {
                 if(data && data.Areas){
@@ -57,7 +112,8 @@
                         var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
                             style: function (feature) {
                                 return {color: feature.properties.color};
-                            }
+                            },
+                            onEachFeature: onEachFeature
                         }).bindPopup(function (layer) {
                             return layer.feature.properties.description;
                         });
@@ -65,6 +121,20 @@
                         gsonLayer.addTo(map);
                     }, this);
                 }
+            });
+
+            $.get( "/api/v1/object", function( data ) {
+                if(data && data.Objects){
+                    data.Objects.forEach(function(obj) {
+                        var marker = L.marker([obj.lat, obj.long]);
+                        markers.push(marker);
+                        marker.addTo(map);
+                    }, this);
+                }
+            });
+
+            map.on('zoomend', function() {
+                console.log("end");
             });
         });
     </script>
