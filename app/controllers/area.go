@@ -13,8 +13,8 @@ type Area struct {
 }
 
 func (c Area) Index() revel.Result {
-	moreStyles := []string{"css/leaflet.css"}
-	moreScripts := []string{"js/leaflet.js"}
+	moreStyles := []string{"public/css/leaflet.css"}
+	moreScripts := []string{"public/js/leaflet.js"}
 	IsAreas := true
 
 	results, err := c.Txn.Select(models.Area{},

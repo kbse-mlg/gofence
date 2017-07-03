@@ -13,8 +13,8 @@ type Object struct {
 }
 
 func (c Object) Index() revel.Result {
-	moreStyles := []string{"css/leaflet.css"}
-	moreScripts := []string{"js/leaflet.js"}
+	moreStyles := []string{"public/css/leaflet.css"}
+	moreScripts := []string{"public/js/leaflet.js"}
 	IsObjects := true
 
 	results, err := c.Txn.Select(models.Object{},
