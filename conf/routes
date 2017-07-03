@@ -6,7 +6,6 @@
 module:testrunner
 # module:jobs
 
-
 GET     /                                        App.Index
 GET     /areas                                   Area.Index
 GET     /objects                                 Object.Index
@@ -22,3 +21,9 @@ GET     /public/*filepath                       Static.Serve("public")
 
 # Catch all
 *       /:controller/:action                    :controller.:action
+
+
+# API
+
+GET     /api/v1/area                            Area.ListJson
+GET     /api/v1/object                          Object.ListJson

@@ -25,7 +25,7 @@ const (
 	RESULT = "result"
 )
 
-// Event is a type for
+// Event is a type for communication
 //
 type Event struct {
 	Type      string // "create" "destroy" "position", "list", or "object"

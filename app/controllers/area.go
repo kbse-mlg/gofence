@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/kbse-mlg/gofence/app/models"
@@ -41,15 +42,51 @@ func (c Area) List(search string, size, page int) revel.Result {
 	var areas []*models.Area
 	if search == "" {
 		areas = loadAreas(c.Txn.Select(models.Area{},
-			`select * from Area limit ?, ?`, (page-1)*size, size))
+			`select * from "Area" OFFSET $1 LIMIT $2`, (page-1)*size, size))
 	} else {
 		search = strings.ToLower(search)
 		areas = loadAreas(c.Txn.Select(models.Area{},
-			`select * from Area where lower(Name) like ? or lower(Geodata) like ?
- limit ?, ?`, "%"+search+"%", "%"+search+"%", (page-1)*size, size))
+			`select * from "Area" where lower(Name) like $1 or lower(Geodata) like $2
+ OFFSET $3 LIMIT $4`, "%"+search+"%", "%"+search+"%", (page-1)*size, size))
 	}
 
 	return c.Render(areas, search, size, page, nextPage)
+}
+
+func (c Area) ListJson() revel.Result {
+
+	size, _ := strconv.ParseInt(c.Params.Route.Get("size"), 0, 64)
+	search := c.Params.Route.Get("search")
+	page, _ := strconv.ParseInt(c.Params.Route.Get("page"), 0, 64)
+
+	if page == 0 {
+		page = 1
+	}
+
+	if size == 0 {
+		size = 10
+	}
+	search = strings.TrimSpace(search)
+
+	var areas []*models.Area
+	if search == "" {
+		areas = loadAreas(c.Txn.Select(models.Area{},
+			`select * from "Area" OFFSET $1 LIMIT $2`, (page-1)*size, size))
+	} else {
+		search = strings.ToLower(search)
+		areas = loadAreas(c.Txn.Select(models.Area{},
+			`select * from "Area" where lower(Name) like $1 or lower(Geodata) like $2
+ OFFSET $3 LIMIT $4`, "%"+search+"%", "%"+search+"%", (page-1)*size, size))
+	}
+
+	result := models.AreaCollection{
+		CurrentSearch: search,
+		Areas:         areas,
+		Size:          size,
+		Page:          page,
+	}
+
+	return c.RenderJSON(result)
 }
 
 func loadAreas(results []interface{}, err error) []*models.Area {

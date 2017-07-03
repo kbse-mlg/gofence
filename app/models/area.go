@@ -7,10 +7,15 @@ import (
 )
 
 type Area struct {
-	AreaID  int
-	Name    string
-	Geodata string
-	Type    int
+	AreaID  int    `json:"area_id"`
+	Name    string `json:"name"`
+	Geodata string `json:"geodata"`
+	Type    int    `json:"type"`
+}
+
+type Profile struct {
+	Color  string
+	Active bool
 }
 
 func (u *Area) String() string {
@@ -28,4 +33,11 @@ func (area *Area) Validate(v *revel.Validation) {
 	v.Check(area.Geodata,
 		revel.Required{},
 	)
+}
+
+type AreaCollection struct {
+	Areas         []*Area
+	CurrentSearch string
+	Size          int64
+	Page          int64
 }

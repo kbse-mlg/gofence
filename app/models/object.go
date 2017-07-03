@@ -8,11 +8,12 @@ import (
 )
 
 type Object struct {
-	ObjectID int
-	Name     string
-	Long     float64
-	Lat      float64
-	Type     int
+	ObjectID int     `json:"object_id"`
+	Group    string  `json:"group"`
+	Name     string  `json:"name"`
+	Long     float64 `json:"long"`
+	Lat      float64 `json:"lat"`
+	Type     int     `json:"type"`
 }
 
 func (u *Object) String() string {
@@ -28,4 +29,16 @@ func (obj *Object) Validate(v *revel.Validation) {
 		revel.MinSize{4},
 		revel.Match{nameRegex},
 	)
+	v.Check(obj.Group,
+		revel.Required{},
+		revel.MaxSize{100},
+		revel.MinSize{4},
+	)
+}
+
+type ObjectCollection struct {
+	Objects       []*Object
+	CurrentSearch string
+	Size          int64
+	Page          int64
 }

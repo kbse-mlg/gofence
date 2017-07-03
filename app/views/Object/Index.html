@@ -42,6 +42,7 @@
                                       <thead>
                                       <tr>
                                           <th>Name</th>
+                                          <th>Group</th>
                                           <th>Long</th>
                                           <th>Lat</th>
                                           <th>Edit</th>
@@ -52,9 +53,9 @@
                                       {{range .objects}}
                                       <tr>
                                           <td>{{.Name}}</td>
+                                          <td>{{.Group}}</td>
                                           <td>{{.Long}}</td>
                                           <td>{{.Lat}}</td>
-                                          <td>{{.Type}}</td>
                                           <td>
                                               <p>
                                                   <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#edit" data-placement="top"><span class="fa fa-fw ti-pencil"></span></button>

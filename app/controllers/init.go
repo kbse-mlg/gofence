@@ -8,3 +8,9 @@ func init() {
 	revel.InterceptMethod((*GorpController).Commit, revel.AFTER)
 	revel.InterceptMethod((*GorpController).Rollback, revel.FINALLY)
 }
+
+type JsonResponse struct {
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data"`
+	Error   string      `json:"error"`
+}

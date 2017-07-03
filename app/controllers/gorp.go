@@ -19,7 +19,9 @@ var (
 func InitDB() {
 	db.Init()
 	Dbm = &gorp.DbMap{Db: db.Db, Dialect: gorp.PostgresDialect{}}
+}
 
+func InsertData() {
 	setColumnSizes := func(t *gorp.TableMap, colSizes map[string]int) {
 		for col, size := range colSizes {
 			t.ColMap(col).MaxSize = size
@@ -35,10 +37,11 @@ func InitDB() {
 
 	t = Dbm.AddTable(models.Object{}).SetKeys(true, "ObjectID")
 	setColumnSizes(t, map[string]int{
-		"Name": 100,
-		"Long": 11,
-		"Lat":  11,
-		"Type": 6,
+		"Name":  100,
+		"Group": 100,
+		"Long":  11,
+		"Lat":   11,
+		"Type":  6,
 	})
 
 	Dbm.TraceOn("[gorp]", r.INFO)
@@ -112,7 +115,7 @@ func InitDB() {
 	}
 
 	objects := []*models.Object{
-		&models.Object{0, "A1", 101.67458295822144, 3.1290962786081646, 1},
+		&models.Object{0, "A1", "truck", 101.67458295822144, 3.1290962786081646, 1},
 	}
 
 	for _, obj := range objects {

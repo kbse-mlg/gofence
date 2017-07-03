@@ -6,7 +6,7 @@
         <section class="content-header">
             <div class="col-lg-6 col-md-6 col-sm-5 col-xs-8">
                 <div class="header-element">
-                    <h3>Clear/
+                    <h3>GoFence/
                         <small>Dashboard</small>
                     </h3>
                 </div>
@@ -34,70 +34,7 @@
     </aside>
     <script type='text/javascript'>
         $(document).ready(function(){
-           var geojsonSample = {
-                "type": "FeatureCollection",
-                "features": [
-                    {
-                    "type": "Feature",
-                    "properties": {
-                        "color":"red"
-                    },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [
-                        [
-                            [
-                            101.67458295822144,
-                            3.1290962786081646
-                            ],
-                            [
-                            101.67694330215454,
-                            3.127125114155911
-                            ],
-                            [
-                            101.67750120162964,
-                            3.1273822227728822
-                            ],
-                            [
-                            101.6785740852356,
-                            3.1284106566103684
-                            ],
-                            [
-                            101.67887449264526,
-                            3.128796319039309
-                            ],
-                            [
-                            101.67833805084227,
-                            3.129267684037543
-                            ],
-                            [
-                            101.67923927307129,
-                            3.1302532647123797
-                            ],
-                            [
-                            101.67709350585938,
-                            3.13222442328034
-                            ],
-                            [
-                            101.67563438415527,
-                            3.130638926463226
-                            ],
-                            [
-                            101.67522668838501,
-                            3.1299747311373816
-                            ],
-                            [
-                            101.67458295822144,
-                            3.1290962786081646
-                            ]
-                        ]
-                        ]
-                    }
-                    }
-                ]
-            };
-
-
+           
             // initialize the map on the "map" div with a given center and zoom
             var map = L.map('gmapid', {
                 center: [3.1290962786081646, 101.67658295822144],
@@ -110,15 +47,25 @@
                 id: 'mapbox.streets',
                 accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
             }).addTo(map);
+            
+            var layers = [];
 
-            var gsonLayer = L.geoJSON();
-            L.geoJSON(geojsonSample, {
-                    style: function (feature) {
-                        return {color: feature.properties.color};
-                    }
-                }).bindPopup(function (layer) {
-                    return layer.feature.properties.description;
-                }).addTo(map);
+            $.get( "/api/v1/area", function( data ) {
+                if(data && data.Areas){
+                    data.Areas.forEach(function(area) {
+                        console.log(area);
+                        var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
+                            style: function (feature) {
+                                return {color: feature.properties.color};
+                            }
+                        }).bindPopup(function (layer) {
+                            return layer.feature.properties.description;
+                        });
+                        layers.push(gsonLayer);
+                        gsonLayer.addTo(map);
+                    }, this);
+                }
+            });
         });
     </script>
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
