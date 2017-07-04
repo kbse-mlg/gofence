@@ -93,7 +93,7 @@ var (
 	publish = make(chan Event, 10)
 )
 
-// This function loops forever, handling the chat room pubsub
+// This function loops forever, handling the geofence pubsub
 func geofence() {
 	archive := list.New()
 	subscribers := list.New()

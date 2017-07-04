@@ -3,6 +3,8 @@ package geofence
 import (
 	"log"
 
+	"fmt"
+
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -18,17 +20,37 @@ import (
 	"object":{"type":"Point","coordinates":[-112.269,33.5123]}
 }
 */
+
+var (
+	redispool         *redis.Pool
+	tile38Pool        *redis.Pool
+	redisHookTemplate string = `redis://%s/%s`
+)
+
 func init() {
 	go pubSubRedis()
 }
 
+func newPool(address string) *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:   80,
+		MaxActive: 12000, // max number of connections
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", address)
+			if err != nil {
+				panic(err.Error())
+			}
+			return c, err
+		},
+	}
+
+}
+
 func pubSubRedis() {
+	redispool = newPool(":6379")
+	tile38Pool = newPool(":9851")
 	for {
-		c, err := redis.Dial("tcp", ":6379")
-		if err != nil {
-			log.Fatalf("Could not connect: %v\n", err)
-		}
-		log.Println("Oke")
+		c := redispool.Get()
 		defer c.Close()
 		psc := redis.PubSubConn{Conn: c}
 		psc.PSubscribe("fence.*")
@@ -46,4 +68,23 @@ func pubSubRedis() {
 		}
 		c.Close()
 	}
+}
+
+func SetObject(name, group, lat, long string) {
+	c := tile38Pool.Get()
+	defer c.Close()
+	c.Do("SET", group, name, "POINT", lat, long)
+}
+
+func SetGeofenceHook(name, group, geojson, redisAddress string) {
+	c := tile38Pool.Get()
+	defer c.Close()
+
+	c.Do("SETHOOK", name, fmt.Sprintf(redisHookTemplate, redisAddress, name), "WITHIN", group, "FENCE", "OBJECT", geojson)
+}
+
+func DeleteGeofenceHook(name string) {
+	c := tile38Pool.Get()
+	defer c.Close()
+	c.Do("DELHOOK", name)
 }

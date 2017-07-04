@@ -15,7 +15,9 @@ type WebSocket struct {
 
 type ClientData struct {
 	Command string  `json:"cmd"`
-	Data    string  `json:"data"`
+	Name    string  `json:"name"`
+	Geojson string  `json:"geojson"`
+	Group   string  `json:"group"`
 	Long    float64 `json:"long"`
 	Lat     float64 `json:"lat"`
 }
@@ -51,7 +53,7 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 		}
 	}()
 
-	// Now listen for new events from either the websocket or the chatroom.
+	// Now listen for new events from either the websocket
 	for {
 		select {
 		case event := <-subscription.New:
@@ -77,13 +79,12 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 func doProcess(cd *ClientData) {
 	switch cmd := cd.Command; cmd {
 	case geofence.POSITION:
-		geofence.Position(cd.Data, cd.Lat, cd.Long)
+		geofence.Position(cd.Name, cd.Lat, cd.Long)
 	case geofence.SETHOOK:
+		geofence.SetGeofenceHook(cd.Name, cd.Group, cd.Geojson, ":6379")
 	case geofence.DELHOOK:
-	case geofence.JOIN:
-	case geofence.LEAVE:
-	case geofence.RESULT:
+		geofence.DeleteHook(cd.Name)
 	default:
-		geofence.Position("lalalala", 10, 10)
+		revel.TRACE.Println("no process")
 	}
 }
