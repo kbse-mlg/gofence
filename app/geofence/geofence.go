@@ -28,12 +28,12 @@ const (
 // Event is a type for communication
 //
 type Event struct {
-	Type      string // "create" "destroy" "position", "list", or "object"
-	Name      string
-	Timestamp int    // Unix timestamp (secs)
-	Data      string // What the user said (if Type == "message")
-	Long      float64
-	Lat       float64
+	Type      string  `json:"type"` // "create" "destroy" "position", "list", or "object"
+	Name      string  `json:"name"`
+	Timestamp int     `json:"timestamp"` // Unix timestamp (secs)
+	Data      string  `json:"data"`      // What the user said (if Type == "message")
+	Long      float64 `json:"long"`
+	Lat       float64 `json:"lat"`
 }
 
 type Subscription struct {

@@ -11,7 +11,7 @@ GET     /areas                                   Area.Index
 GET     /objects                                 Object.Index
 
 # WebSocket demo
-WS      /websocket/hook/set                     WebSocket.SetHook
+WS      /websocket/geofence                     WebSocket.Geofence
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

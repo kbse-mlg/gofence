@@ -135,6 +135,8 @@
         dm.init();
         dm.loadArea();
         dm.loadObject();
+        var sm = socketManager();
+        sm.init();
     </script>
 
 {{template "footer.html" .}}

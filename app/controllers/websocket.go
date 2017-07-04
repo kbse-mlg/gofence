@@ -20,7 +20,7 @@ type ClientData struct {
 	Lat     float64 `json:"lat"`
 }
 
-func (c WebSocket) SetHook(name, geojson string, ws *websocket.Conn) revel.Result {
+func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 	// Join the room.
 	subscription := geofence.Subscribe()
 	defer subscription.Cancel()
