@@ -56,7 +56,7 @@
                                     <tbody>
                                      {{range .objects}}
                                       <tr>
-                                          <td>{{.Name}}</td>
+                                          <td><a href="#" class="setCenter" long="{{.Long}}" lat="{{.Lat}}" name="{{.Name}}"/>{{.Name}}</a></td>
                                           <td>{{.Group}}</td>
                                           <td>{{.Long}}</td>
                                           <td>{{.Lat}}</td>
@@ -85,8 +85,9 @@
                 id: "gmapid",
                 map: null,
                 urlTileLayer:"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
-                setCenter: function(lat, long){
-                    this.center = [lat, long];
+                setCenter: function(lat, long, name){
+                    this.map.panTo(new L.LatLng(lat, long));
+                    this.markers[name].openPopup();
                 },
                 init:function(){
                     this.map = L.map(this.id, {
@@ -124,8 +125,7 @@
                     $.get( "/api/v1/object", function( data ) {
                         if(data && data.Objects){
                             data.Objects.forEach(function(obj) {
-                                self.markers[obj.Name] = L.marker([obj.lat, obj.long]);
-                                self.markers[obj.Name].bindPopup(obj.name).addTo(self.map)
+                                self.markers[obj.name] = L.marker([obj.lat, obj.long]).bindPopup(obj.name).addTo(self.map);
                             });
                         }
                     });
@@ -137,6 +137,12 @@
         dm.loadObject();
         var sm = socketManager();
         sm.init();
+
+        $('.setCenter').click(function(e){
+            e.preventDefault();
+            var target = $(e.target);
+            dm.setCenter(target.attr("lat"), target.attr("long"), target.attr("name"));
+        });
     </script>
 
 {{template "footer.html" .}}

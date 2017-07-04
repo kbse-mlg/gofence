@@ -69,17 +69,15 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 			if err == nil {
 				// put error message
 			}
-
 			doProcess(&m)
 		}
 	}
-	return nil
 }
 
-func doProcess(clientData *ClientData) {
-	switch cmd := clientData.Command; cmd {
+func doProcess(cd *ClientData) {
+	switch cmd := cd.Command; cmd {
 	case geofence.POSITION:
-		geofence.Position(clientData.Data, 10, 10)
+		geofence.Position(cd.Data, cd.Lat, cd.Long)
 	case geofence.SETHOOK:
 	case geofence.DELHOOK:
 	case geofence.JOIN:
