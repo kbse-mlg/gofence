@@ -12,7 +12,7 @@ type App struct {
 func (c App) Index() revel.Result {
 	moreScripts := []string{
 		"https://maps.googleapis.com/maps/api/js?key=AIzaSyBJFNacrQSkWIUsbZjLw4wHo0yyF9DDrgE",
-		"/public/js/app/dashboard.js",
+		"/public/js/app/socket.js",
 	}
 	moreStyles := []string{
 		"https://unpkg.com/leaflet@1.0.3/dist/leaflet.css",

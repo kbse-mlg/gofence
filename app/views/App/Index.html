@@ -40,7 +40,6 @@
                             </h3>
                             <span class="pull-right">
                                 <i class="fa fa-fw ti-angle-up clickable"></i>
-                                <i class="fa fa-fw ti-close removepanel clickable"></i>
                             </span>
                         </div>
                         <div class="panel-body">
@@ -72,77 +71,70 @@
             <!-- row -->
         </section>
     </aside>
-    <script type='text/javascript'>
-
-        var layers = [];
-        var markers = {};
-        
-        $(document).ready(function(){
-           
-            // initialize the map on the "map" div with a given center and zoom
-            var map = L.map('gmapid', {
-                center: [3.1290962786081646, 101.67658295822144],
-                zoom: 17
-            });
-
-            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                maxZoom: 18,
-                id: 'mapbox.streets',
-                accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
-            }).addTo(map);
-
-            function whenClicked(e) {
-                // e = event
-                console.log(e);
-                // You can make your ajax call declaration here
-                //$.ajax(... 
-            }
-
-            function onEachFeature(feature, layer) {
-                //bind click
-                layer.on({
-                    click: whenClicked
-                });
-            }
-
-            $.get( "/api/v1/area", function( data ) {
-                if(data && data.Areas){
-                    data.Areas.forEach(function(area) {
-                        var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
-                            style: function (feature) {
-                                return {color: feature.properties.color};
-                            },
-                            onEachFeature: onEachFeature
-                        }).bindPopup(function (layer) {
-                            return layer.feature.properties.description;
-                        });
-                        layers.push(gsonLayer);
-                        gsonLayer.addTo(map);
-                    }, this);
-                }
-            });
-
-            $.get( "/api/v1/object", function( data ) {
-                if(data && data.Objects){
-                    data.Objects.forEach(function(obj) {
-                        markers[obj.Name] = L.marker([obj.lat, obj.long]);
-                        markers[obj.Name].bindPopup(obj.name).addTo(map)
-                    });
-                }
-            });
-            
-            map.on('zoomend', function() {
-                console.log("end");
-            });
-
-            function focusOn(name) {
-                markers[name].openPopup();
-            }
-            window.focusOn = focusOn;
-        });
-    </script>
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
    integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
    crossorigin=""></script>
+    <script type='text/javascript'>
+        var dm = function($, L){
+            return{
+                //attribute
+                center:[3.1290962786081646, 101.67658295822144],
+                zoom:17,
+                layers:[],
+                markers:{},
+                id: "gmapid",
+                map: null,
+                urlTileLayer:"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
+                setCenter: function(lat, long){
+                    this.center = [lat, long];
+                },
+                init:function(){
+                    this.map = L.map(this.id, {
+                        center: this.center,
+                        zoom: this.zoom
+                    });
+
+                    L.tileLayer(this.urlTileLayer, {
+                        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                        maxZoom: 18,
+                        id: 'mapbox.streets',
+                        accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+                    }).addTo(this.map);
+                },
+                loadArea:function(){
+                    var self = this;
+                    $.get( "/api/v1/area", function( data ) {
+                        if(data && data.Areas){
+                            data.Areas.forEach(function(area) {
+                                var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
+                                    style: function (feature) {
+                                        return {color: feature.properties.color};
+                                    },
+                                }).bindPopup(function (layer) {
+                                    return layer.feature.properties.description;
+                                });
+                                self.layers.push(gsonLayer);
+                                gsonLayer.addTo(self.map);
+                            }, this);
+                        }
+                    });
+                },
+                loadObject:function(){
+                    var self = this;
+                    $.get( "/api/v1/object", function( data ) {
+                        if(data && data.Objects){
+                            data.Objects.forEach(function(obj) {
+                                self.markers[obj.Name] = L.marker([obj.lat, obj.long]);
+                                self.markers[obj.Name].bindPopup(obj.name).addTo(self.map)
+                            });
+                        }
+                    });
+                }
+            };
+        }( jQuery , L);
+        dm.init();
+        dm.loadArea();
+        dm.loadObject();
+    </script>
+
 {{template "footer.html" .}}
