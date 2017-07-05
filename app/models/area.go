@@ -11,6 +11,7 @@ type Area struct {
 	Name    string `json:"name"`
 	Geodata string `json:"geodata"`
 	Type    int    `json:"type"`
+	Group   string `json:"group"`
 }
 
 type Profile struct {
@@ -31,6 +32,10 @@ func (area *Area) Validate(v *revel.Validation) {
 	)
 
 	v.Check(area.Geodata,
+		revel.Required{},
+	)
+
+	v.Check(area.Group,
 		revel.Required{},
 	)
 }

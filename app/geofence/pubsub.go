@@ -24,7 +24,7 @@ import (
 var (
 	redispool         *redis.Pool
 	tile38Pool        *redis.Pool
-	redisHookTemplate string = `redis://%s/%s`
+	redisHookTemplate string = "redis://%s/%s"
 )
 
 func init() {
@@ -43,7 +43,6 @@ func newPool(address string) *redis.Pool {
 			return c, err
 		},
 	}
-
 }
 
 func pubSubRedis() {
@@ -79,12 +78,18 @@ func SetObject(name, group, lat, long string) {
 func SetGeofenceHook(name, group, geojson, redisAddress string) {
 	c := tile38Pool.Get()
 	defer c.Close()
-
-	c.Do("SETHOOK", name, fmt.Sprintf(redisHookTemplate, redisAddress, name), "WITHIN", group, "FENCE", "OBJECT", geojson)
+	fmt.Println(group, geojson)
+	ret, err := c.Do("SETHOOK", name, fmt.Sprintf(redisHookTemplate, redisAddress, name), "WITHIN", group, "FENCE", "OBJECT", geojson)
+	if err != nil {
+		fmt.Printf("%v -- %v", ret, err)
+	}
 }
 
 func DeleteGeofenceHook(name string) {
 	c := tile38Pool.Get()
 	defer c.Close()
-	c.Do("DELHOOK", name)
+	ret, err := c.Do("DELHOOK", name)
+	if err != nil {
+		fmt.Printf("%d -- %v", ret, err)
+	}
 }

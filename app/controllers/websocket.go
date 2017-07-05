@@ -66,6 +66,7 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 			if !ok {
 				return nil
 			}
+			revel.TRACE.Println(msg)
 			var m ClientData
 			err := json.Unmarshal([]byte(msg), &m)
 			if err == nil {
@@ -81,6 +82,7 @@ func doProcess(cd *ClientData) {
 	case geofence.POSITION:
 		geofence.Position(cd.Name, cd.Lat, cd.Long)
 	case geofence.SETHOOK:
+		geofence.Sethook(cd.Name, cd.Geojson)
 		geofence.SetGeofenceHook(cd.Name, cd.Group, cd.Geojson, ":6379")
 	case geofence.DELHOOK:
 		geofence.DeleteHook(cd.Name)
