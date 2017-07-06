@@ -3,14 +3,16 @@ package controllers
 import (
 	"encoding/json"
 
+	"fmt"
+
+	"github.com/go-gorp/gorp"
+	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/revel/revel"
 	"golang.org/x/net/websocket"
-
-	"github.com/kbse-mlg/gofence/app/geofence"
 )
 
 type WebSocket struct {
-	*revel.Controller
+	App
 }
 
 type ClientData struct {
@@ -72,21 +74,36 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 			if err == nil {
 				// put error message
 			}
-			doProcess(&m)
+			doProcess(c.Txn, &m)
 		}
 	}
 }
 
-func doProcess(cd *ClientData) {
+func doProcess(txn *gorp.Transaction, cd *ClientData) {
 	switch cmd := cd.Command; cmd {
 	case geofence.POSITION:
+		updatePos(txn, cd.Name, cd.Lat, cd.Long)
 		geofence.Position(cd.Name, cd.Lat, cd.Long)
 	case geofence.SETHOOK:
-		geofence.Sethook(cd.Name, cd.Geojson)
-		geofence.SetGeofenceHook(cd.Name, cd.Group, cd.Geojson, ":6379")
+		geofence.SetFenceHook(cd.Name, cd.Group, cd.Geojson, ":6379")
 	case geofence.DELHOOK:
 		geofence.DeleteHook(cd.Name)
 	default:
 		revel.TRACE.Println("no process")
+	}
+}
+
+func updatePos(txn *gorp.Transaction, name string, lat, long float64) {
+	fmt.Println(name, lat, long)
+	_, err := txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 WHERE "Name"=$3`, lat, long, name)
+	if err != nil {
+		fmt.Println("--pos-----", err.Error())
+	}
+}
+
+func updatePosById(txn *gorp.Transaction, id int64, lat, long float64) {
+	_, err := txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 where "ObjectID"=$3`, lat, long, id)
+	if err != nil {
+		fmt.Println("--id-----", err.Error())
 	}
 }

@@ -28,7 +28,7 @@ var (
 )
 
 func init() {
-	go pubSubRedis()
+	go initPubSub()
 }
 
 func newPool(address string) *redis.Pool {
@@ -45,7 +45,7 @@ func newPool(address string) *redis.Pool {
 	}
 }
 
-func pubSubRedis() {
+func initPubSub() {
 	redispool = newPool(":6379")
 	tile38Pool = newPool(":9851")
 	for {
@@ -69,13 +69,15 @@ func pubSubRedis() {
 	}
 }
 
+// SetObject set object name
 func SetObject(name, group, lat, long string) {
 	c := tile38Pool.Get()
 	defer c.Close()
 	c.Do("SET", group, name, "POINT", lat, long)
 }
 
-func SetGeofenceHook(name, group, geojson, redisAddress string) {
+// SetFenceHook set webhook to redis
+func SetFenceHook(name, group, geojson, redisAddress string) {
 	c := tile38Pool.Get()
 	defer c.Close()
 	fmt.Println(group, geojson)
@@ -85,10 +87,21 @@ func SetGeofenceHook(name, group, geojson, redisAddress string) {
 	}
 }
 
-func DeleteGeofenceHook(name string) {
+// DelFenceHook delete webhook to redis
+func DelFenceHook(name string) {
 	c := tile38Pool.Get()
 	defer c.Close()
 	ret, err := c.Do("DELHOOK", name)
+	if err != nil {
+		fmt.Printf("%d -- %v", ret, err)
+	}
+}
+
+// DelAllHook delete all webhook to redis
+func DelAllHook() {
+	c := tile38Pool.Get()
+	defer c.Close()
+	ret, err := c.Do("PDELHOOK", "*")
 	if err != nil {
 		fmt.Printf("%d -- %v", ret, err)
 	}

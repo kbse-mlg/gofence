@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/kbse-mlg/gofence/app/models"
 	"github.com/revel/revel"
 )
@@ -65,6 +66,14 @@ func (c Object) ListJson() revel.Result {
 	}
 
 	return c.RenderJSON(result)
+}
+
+func (c Object) UpdatePosition(name string) revel.Result {
+	var obj models.Object
+	c.Params.BindJSON(&obj)
+	updatePos(c.Txn, name, obj.Lat, obj.Long)
+	geofence.Position(name, obj.Lat, obj.Long)
+	return c.RenderJSON("ok")
 }
 
 func loadObjects(results []interface{}, err error) []*models.Object {
