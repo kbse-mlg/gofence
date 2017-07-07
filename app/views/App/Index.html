@@ -1,193 +1,192 @@
-{{set . "title" "Home"}}
-{{template "header.html" .}}
+{{set . "title" "Home"}} {{template "header.html" .}}
 
-    <aside class="right-side">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
-            <div class="col-lg-6 col-md-6 col-sm-5 col-xs-8">
-                <div class="header-element">
-                    <h3>GoFence/
-                        <small>Dashboard</small>
-                    </h3>
-                </div>
+<aside class="right-side">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="col-lg-6 col-md-6 col-sm-5 col-xs-8">
+            <div class="header-element">
+                <h3>GoFence/
+                    <small>Dashboard</small>
+                </h3>
             </div>
-        </section>
-        <!-- Main content -->
-        <section class="content">
-            <!-- row -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <!-- Basic charts strats here-->
-                    <div class="panel">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <i class="ti-map-alt"></i> Location
-                            </h4>
-                            <span class="pull-right">
+        </div>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <!-- row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- Basic charts strats here-->
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <i class="ti-map-alt"></i> Location
+                        </h4>
+                        <span class="pull-right">
                                 <i class="fa fa-fw ti-angle-up clickable"></i>
                             </span>
-                        </div>
-                        <div class="panel-body">
-                            <div id="gmapid" class="gmap" style="max-height: 600px; height:600px"></div>
-                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div id="gmapid" class="gmap" style="max-height: 600px; height:600px"></div>
                     </div>
                 </div>
-                <div class="col-lg-12">
-                    <div class="panel ">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">
-                                <i class="ti-layout-cta-left"></i>&nbsp;Object Tracker
-                            </h3>
-                            <span class="pull-right">
+            </div>
+            <div class="col-lg-12">
+                <div class="panel ">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <i class="ti-layout-cta-left"></i>&nbsp;Object Tracker
+                        </h3>
+                        <span class="pull-right">
                                 <i class="fa fa-fw ti-angle-up clickable"></i>
                             </span>
-                        </div>
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Group</th>
                                         <th>Long</th>
                                         <th>Lat</th>
                                     </tr>
-                                    </thead>
-                                    <tbody>
-                                     {{range .objects}}
-                                      <tr>
-                                          <td><a href="#" class="setCenter" long="{{.Long}}" lat="{{.Lat}}" name="{{.Name}}"/>{{.Name}}</a></td>
-                                          <td>{{.Group}}</td>
-                                          <td>{{.Long}}</td>
-                                          <td>{{.Lat}}</td>
-                                      </tr>
-                                      {{end}}
-                                    </tbody>
-                                </table>
-                            </div>
+                                </thead>
+                                <tbody>
+                                    {{range .objects}}
+                                    <tr>
+                                        <td><a href="#" class="setCenter" long="{{.Long}}" lat="{{.Lat}}" name="{{.Name}}" />{{.Name}}</a>
+                                        </td>
+                                        <td>{{.Group}}</td>
+                                        <td>{{.Long}}</td>
+                                        <td>{{.Lat}}</td>
+                                    </tr>
+                                    {{end}}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </div>
             <!-- row -->
-        </section>
-    </aside>
-    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
-   integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
-   crossorigin=""></script>
-    <script type='text/javascript'>
-        var sm = socketManager();
-        sm.init();
-        layers = [];
-        markers = {};
-        var dm = {
-            //attribute
-            center:[3.1290962786081646, 101.67658295822144],
-            zoom:17,
-            id: "gmapid",
-            map: null,
-            geojson:[],
-            markers:{},
-            urlTileLayer:"https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
-            setCenter: function(lat, long, name){
-                this.map.panTo(new L.LatLng(lat, long));
-                this.markers[name].openPopup();
-            },
-            init:function(){
-                this.map = L.map(this.id, {
-                    center: this.center,
-                    zoom: this.zoom
-                });
+    </section>
+</aside>
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+    crossorigin=""></script>
+<script type='text/javascript'>
+    var sm = socketManager();
+    sm.init();
+    layers = [];
+    markers = {};
+    var dm = {
+        //attribute
+        center: [3.1290962786081646, 101.67658295822144],
+        zoom: 17,
+        id: "gmapid",
+        map: null,
+        geojson: [],
+        markers: {},
+        urlTileLayer: "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
+        setCenter: function (lat, long, name) {
+            this.map.panTo(new L.LatLng(lat, long));
+            this.markers[name].openPopup();
+        },
+        init: function () {
+            this.map = L.map(this.id, {
+                center: this.center,
+                zoom: this.zoom
+            });
 
-                L.tileLayer(this.urlTileLayer, {
-                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                    maxZoom: 18,
-                    id: 'mapbox.streets',
-                    accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
-                }).addTo(this.map);
+            L.tileLayer(this.urlTileLayer, {
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                maxZoom: 18,
+                id: 'mapbox.streets',
+                accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+            }).addTo(this.map);
 
-                this.markerGroup = L.layerGroup().addTo(this.map);
-            },
-            loadArea:function(){
-                var self = this;
-                $.get( "/api/v1/area", function( data ) {
-                    if(data && data.Areas){
-                        data.Areas.forEach(function(area) {
-                            sm.sethook("fence."+area.name, area.group, area.geodata);
-                            var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
-                                style: function (feature) {
-                                    return {color: feature.properties.color};
-                                },
-                            }).bindPopup(function (layer) {
-                                return self.geojson.feature.properties.description;
-                            });
-                            self.geojson.push(gsonLayer);
-                            gsonLayer.addTo(self.map);
-                        }, this);
-                    }
-                });
-            },
-            loadObject:function(){
-                var self = this;
-                $.get( "/api/v1/object", function( data ) {
-                    if(data && data.Objects){
-                        data.Objects.forEach(function(obj) {
-                            self.markers[obj.name] = L.marker([obj.lat, obj.long]).bindPopup(obj.name).addTo(self.markerGroup); 
+            this.markerGroup = L.layerGroup().addTo(this.map);
+        },
+        loadArea: function () {
+            var self = this;
+            $.get("/api/v1/area", function (data) {
+                if (data && data.Areas) {
+                    data.Areas.forEach(function (area) {
+                        sm.sethook("fence." + area.name, area.group, area.geodata);
+                        var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
+                            style: function (feature) {
+                                return { color: feature.properties.color };
+                            },
+                        }).bindPopup(function (layer) {
+                            return self.geojson.feature.properties.description;
                         });
-                    }
-                });
-            },
-            updateLocation:function(name, lat, long){
-                var self = this;
-                if(!self.markers.hasOwnProperty(name)){
-                    console.log("ra nemu");
-                    return;
+                        self.geojson.push(gsonLayer);
+                        gsonLayer.addTo(self.map);
+                    }, this);
                 }
-                var marker = self.markers[name];
-                console.log(marker._leaflet_id);
-                this.markerGroup.remove(marker._leaflet_id);
-                var newLatLng = new L.LatLng(lat, long);
-                marker.setLatLng([lat, long]).addTo(self.markerGroup);
-            },
-            updateLocation:function(){
-                this.markerGroup.clearLayers();
-                this.loadObject();
+            });
+        },
+        loadObject: function () {
+            var self = this;
+            $.get("/api/v1/object", function (data) {
+                if (data && data.Objects) {
+                    data.Objects.forEach(function (obj) {
+                        self.markers[obj.name] = L.marker([obj.lat, obj.long]).bindPopup(obj.name).addTo(self.markerGroup);
+                    });
+                }
+            });
+        },
+        updateLocation: function (name, lat, long) {
+            var self = this;
+            if (!self.markers.hasOwnProperty(name)) {
+                console.log("ra nemu");
+                return;
             }
-        };
-        dm.init();
-        dm.loadArea();
-        dm.loadObject();
-        
-        sm.onPosition = function(data){
-            dm.updateLocation(data.name, data.lat, data.long);
-            //dm.loadObject();
-            dm.updateLocation();
-        };
-
-        function debounce(fn, delay) {
-            var timer = null;
-            return function () {
-                var context = this, args = arguments;
-                clearTimeout(timer);
-                timer = setTimeout(function () {
-                fn.apply(context, args);
-                }, delay);
-            };
+            var marker = self.markers[name];
+            console.log(marker._leaflet_id);
+            this.markerGroup.remove(marker._leaflet_id);
+            var newLatLng = new L.LatLng(lat, long);
+            marker.setLatLng([lat, long]).addTo(self.markerGroup);
+        },
+        updateLocation: function () {
+            this.markerGroup.clearLayers();
+            this.loadObject();
         }
-        var timer =null;
-        sm.onResult = function(result){
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                if(result.data){
-                    var data = JSON.parse(result.data);
-                    console.log(data);
-                }
-            }, 1000);
-        };
+    };
+    dm.init();
+    dm.loadArea();
+    dm.loadObject();
 
-        $('.setCenter').click(function(e){
-            e.preventDefault();
-            var target = $(e.target);
-            dm.setCenter(target.attr("lat"), target.attr("long"), target.attr("name"));
-        });
-    </script>
+    sm.onPosition = function (data) {
+        dm.updateLocation(data.name, data.lat, data.long);
+        //dm.loadObject();
+        dm.updateLocation();
+    };
+
+    function debounce(fn, delay) {
+        var timer = null;
+        return function () {
+            var context = this, args = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                fn.apply(context, args);
+            }, delay);
+        };
+    }
+    var timer = null;
+    sm.onResult = function (result) {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            if (result.data) {
+                var data = JSON.parse(result.data);
+                console.log(data);
+            }
+        }, 1000);
+    };
+
+    $('.setCenter').click(function (e) {
+        e.preventDefault();
+        var target = $(e.target);
+        dm.setCenter(target.attr("lat"), target.attr("long"), target.attr("name"));
+    });
+</script>
 {{template "footer.html" .}}

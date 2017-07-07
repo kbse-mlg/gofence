@@ -1,80 +1,79 @@
-{{set . "title" "Home"}}
-{{template "header.html" .}}
+{{set . "title" "Home"}} {{template "header.html" .}}
 
 
-    <aside class="right-side">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
-            <h1>
-                Geofence Area
-            </h1>
-            <ol class="breadcrumb">
-                <li>
-                    <a href="/">
+<aside class="right-side">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Geofence Area
+        </h1>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">
                         <i class="fa fa-fw ti-widgetized"></i> Data
                     </a>
-                </li>
-                <li class="active">
-                    Areas
-                </li>
-            </ol>
-        </section>
-        <!-- Main content -->
-        <section class="content">
-            <!-- row -->
-            <div class="row">
+            </li>
+            <li class="active">
+                Areas
+            </li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <!-- row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- Basic charts strats here-->
                 <div class="col-lg-12">
-                    <!-- Basic charts strats here-->
-                  <div class="col-lg-12">
-                      <div class="panel ">
-                          <div class="panel-heading">
-                              <h3 class="panel-title">
-                                  <i class="ti-list"></i> Area table
-                              </h3>
-                              <span class="pull-right">
-                                      <i class="fa fa-fw ti-angle-up clickable"></i>
-                                  </span>
-                          </div>
-                          <div class="panel-body">
-                              <div class="table-responsive">
-                                  <table id="mytable" class="table table-bordred table-striped">
-                                      <thead>
-                                      <tr>
-                                          <th>Name</th>
-                                          <th>Geodata</th>
-                                          <th>Type</th>
-                                          <th>Edit</th>
-                                          <th>Delete</th>
-                                      </tr>
-                                      </thead>
-                                      <tbody>
-                                      {{range .areas}}
-                                      <tr>
-                                          <td>{{.Name}}</td>
-                                          <td>{{.Geodata}}</td>
-                                          <td>{{.Type}}</td>
-                                          <td>
-                                              <p>
-                                                  <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#edit" data-placement="top"><span class="fa fa-fw ti-pencil"></span></button>
-                                              </p>
-                                          </td>
-                                          <td>
-                                              <p>
-                                                  <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#delete" data-placement="top"><span class="fa fa-fw ti-trash"></span></button>
-                                              </p>
-                                          </td>
-                                      </tr>
-                                      {{end}}
-                                      </tbody>
-                                  </table>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+                    <div class="panel ">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <i class="ti-list"></i> Area table
+                            </h3>
+                            <!--<span class="pull-right">
+                                    <i class="fa fa-fw ti-angle-up clickable"></i>
+                                </span>-->
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table id="mytable" class="table table-bordred table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Geodata</th>
+                                            <th>Type</th>
+                                            <th>Edit</th>
+                                            <th>Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{range .areas}}
+                                        <tr>
+                                            <td>{{.Name}}</td>
+                                            <td>{{.Geodata}}</td>
+                                            <td>{{.Type}}</td>
+                                            <td>
+                                                <p>
+                                                    <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#edit" data-placement="top"><span class="fa fa-fw ti-pencil"></span></button>
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <p>
+                                                    <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#delete" data-placement="top"><span class="fa fa-fw ti-trash"></span></button>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
             <!-- row -->
-        </section>
-    </aside>
+    </section>
+</aside>
 
 
 {{template "footer.html" .}}

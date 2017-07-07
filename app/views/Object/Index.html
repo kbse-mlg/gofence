@@ -1,81 +1,78 @@
-{{set . "title" "Home"}}
-{{template "header.html" .}}
-
-
-    <aside class="right-side">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
-            <h1>
-                Object Tracking
-            </h1>
-            <ol class="breadcrumb">
-                <li>
-                    <a href="/">
+{{set . "title" "Home"}} {{template "header.html" .}}
+<aside class="right-side">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Object Tracking
+        </h1>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">
                         <i class="fa fa-fw ti-widget-alt"></i> Data
                     </a>
-                </li>
-                <li class="active">
-                   Object
-                </li>
-            </ol>
-        </section>
-        <!-- Main content -->
-        <section class="content">
-            <!-- row -->
-            <div class="row">
+            </li>
+            <li class="active">
+                Object
+            </li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <!-- row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- Basic charts strats here-->
                 <div class="col-lg-12">
-                    <!-- Basic charts strats here-->
-                  <div class="col-lg-12">
-                      <div class="panel ">
-                          <div class="panel-heading">
-                              <h3 class="panel-title">
-                                  <i class="ti-list"></i> List Object
-                              </h3>
-                              <span class="pull-right">
+                    <div class="panel ">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <i class="ti-list"></i> List Object
+                            </h3>
+                            <!--<span class="pull-right">
                                 <i class="fa fa-fw ti-angle-up clickable"></i>
-                              </span>
-                          </div>
-                          <div class="panel-body">
-                              <div class="table-responsive">
-                                  <table id="mytable" class="table table-bordred table-striped">
-                                      <thead>
-                                      <tr>
-                                          <th>Name</th>
-                                          <th>Group</th>
-                                          <th>Long</th>
-                                          <th>Lat</th>
-                                          <th>Edit</th>
-                                          <th>Delete</th>
-                                      </tr>
-                                      </thead>
-                                      <tbody>
-                                      {{range .objects}}
-                                      <tr>
-                                          <td>{{.Name}}</td>
-                                          <td>{{.Group}}</td>
-                                          <td>{{.Long}}</td>
-                                          <td>{{.Lat}}</td>
-                                          <td>
-                                              <p>
-                                                  <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#edit" data-placement="top"><span class="fa fa-fw ti-pencil"></span></button>
-                                              </p>
-                                          </td>
-                                          <td>
-                                              <p>
-                                                  <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#delete" data-placement="top"><span class="fa fa-fw ti-trash"></span></button>
-                                              </p>
-                                          </td>
-                                      </tr>
-                                      {{end}}
-                                      </tbody>
-                                  </table>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+                              </span>-->
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table id="mytable" class="table table-bordred table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Group</th>
+                                            <th>Long</th>
+                                            <th>Lat</th>
+                                            <th>Edit</th>
+                                            <th>Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{range .objects}}
+                                        <tr>
+                                            <td>{{.Name}}</td>
+                                            <td>{{.Group}}</td>
+                                            <td>{{.Long}}</td>
+                                            <td>{{.Lat}}</td>
+                                            <td>
+                                                <p>
+                                                    <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#edit" data-placement="top"><span class="fa fa-fw ti-pencil"></span></button>
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <p>
+                                                    <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#delete" data-placement="top"><span class="fa fa-fw ti-trash"></span></button>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-        </section>
-    </aside>
+            </div>
+    </section>
+</aside>
 
 
 {{template "footer.html" .}}
