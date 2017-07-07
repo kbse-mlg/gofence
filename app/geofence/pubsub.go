@@ -1,8 +1,6 @@
 package geofence
 
 import (
-	"log"
-
 	"fmt"
 
 	"github.com/garyburd/redigo/redis"
@@ -57,23 +55,28 @@ func initPubSub() {
 		for c.Err() == nil {
 			switch v := psc.Receive().(type) {
 			case redis.PMessage:
-				log.Printf("%s - %s: message: %s\n", v.Pattern, v.Channel, v.Data)
+				fmt.Printf("> %s - %s: message: %s\n", v.Pattern, v.Channel, v.Data)
 				Result(v.Channel, string(v.Data[:len(v.Data)]))
 			case redis.Subscription:
-				log.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
+				fmt.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
 			case error:
 				return
 			}
 		}
+		fmt.Println(c.Err())
 		c.Close()
 	}
 }
 
 // SetObject set object name
-func SetObject(name, group, lat, long string) {
+func SetObject(name, group string, lat, long float64) {
 	c := tile38Pool.Get()
 	defer c.Close()
-	c.Do("SET", group, name, "POINT", lat, long)
+	fmt.Println("SET %s %s POINT %d %d", group, name, lat, long)
+	ret, err := c.Do("SET", group, name, "POINT", lat, long)
+	if err != nil {
+		fmt.Printf("%v -- %v", ret, err)
+	}
 }
 
 // SetFenceHook set webhook to redis

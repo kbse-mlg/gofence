@@ -65,6 +65,7 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 			}
 		case msg, ok := <-newMessages:
 			// If the channel is closed, they disconnected.
+			fmt.Println("-->", msg, ok)
 			if !ok {
 				return nil
 			}
@@ -83,6 +84,7 @@ func doProcess(txn *gorp.Transaction, cd *ClientData) {
 	switch cmd := cd.Command; cmd {
 	case geofence.POSITION:
 		updatePos(txn, cd.Name, cd.Lat, cd.Long)
+		geofence.SetObject(cd.Name, cd.Group, cd.Lat, cd.Long)
 		geofence.Position(cd.Name, cd.Lat, cd.Long)
 	case geofence.SETHOOK:
 		geofence.SetFenceHook(cd.Name, cd.Group, cd.Geojson, ":6379")

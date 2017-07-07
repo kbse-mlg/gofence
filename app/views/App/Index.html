@@ -112,7 +112,7 @@
                 $.get( "/api/v1/area", function( data ) {
                     if(data && data.Areas){
                         data.Areas.forEach(function(area) {
-                            sm.sethook(area.name, area.group, area.geodata);
+                            sm.sethook("fence."+area.name, area.group, area.geodata);
                             var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
                                 style: function (feature) {
                                     return {color: feature.properties.color};
@@ -161,6 +161,27 @@
             dm.updateLocation(data.name, data.lat, data.long);
             //dm.loadObject();
             dm.updateLocation();
+        };
+
+        function debounce(fn, delay) {
+            var timer = null;
+            return function () {
+                var context = this, args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                fn.apply(context, args);
+                }, delay);
+            };
+        }
+        var timer =null;
+        sm.onResult = function(result){
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                if(result.data){
+                    var data = JSON.parse(result.data);
+                    console.log(data);
+                }
+            }, 1000);
         };
 
         $('.setCenter').click(function(e){

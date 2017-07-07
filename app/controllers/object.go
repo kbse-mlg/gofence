@@ -72,6 +72,7 @@ func (c Object) UpdatePosition(name string) revel.Result {
 	var obj models.Object
 	c.Params.BindJSON(&obj)
 	updatePos(c.Txn, name, obj.Lat, obj.Long)
+	geofence.SetObject(name, obj.Group, obj.Lat, obj.Long)
 	geofence.Position(name, obj.Lat, obj.Long)
 	return c.RenderJSON("ok")
 }
