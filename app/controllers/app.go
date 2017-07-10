@@ -2,11 +2,33 @@ package controllers
 
 import (
 	"github.com/kbse-mlg/gofence/app/models"
+	"github.com/kbse-mlg/gofence/app/routes"
 	"github.com/revel/revel"
 )
 
 type App struct {
 	GorpController
+}
+
+func (c App) connected() *models.User {
+	if c.ViewArgs["user"] != nil {
+		return c.ViewArgs["user"].(*models.User)
+	}
+	if username, ok := c.Session["user"]; ok {
+		return c.getUser(username)
+	}
+	return nil
+}
+
+func (c App) getUser(username string) *models.User {
+	users, err := c.Txn.Select(models.User{}, `select * from "User" where "Username" = $1`, username)
+	if err != nil {
+		panic(err)
+	}
+	if len(users) == 0 {
+		return nil
+	}
+	return users[0].(*models.User)
 }
 
 func (c App) Index() revel.Result {
@@ -34,4 +56,12 @@ func (c App) Index() revel.Result {
 	}
 
 	return c.Render(moreScripts, moreStyles, IsDashboard, objects)
+}
+
+func (c App) checkUser() revel.Result {
+	if user := c.connected(); user == nil {
+		c.Flash.Error("Please log in first")
+		return c.Redirect(routes.App.Index())
+	}
+	return nil
 }

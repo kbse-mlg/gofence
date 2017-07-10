@@ -3,6 +3,8 @@ package controllers
 import (
 	"database/sql"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/go-gorp/gorp"
 	//_ "github.com/mattn/go-sqlite3"
 	_ "github.com/lib/pq"
@@ -19,6 +21,7 @@ var (
 func InitDB() {
 	db.Init()
 	Dbm = &gorp.DbMap{Db: db.Db, Dialect: gorp.PostgresDialect{}}
+	//InsertData()
 }
 
 func InsertData() {
@@ -28,7 +31,14 @@ func InsertData() {
 		}
 	}
 
-	t := Dbm.AddTable(models.Area{}).SetKeys(true, "AreaID")
+	t := Dbm.AddTable(models.User{}).SetKeys(true, "UserID")
+	t.ColMap("Password").Transient = true
+	setColumnSizes(t, map[string]int{
+		"Username": 20,
+		"Name":     100,
+	})
+
+	t = Dbm.AddTable(models.Area{}).SetKeys(true, "AreaID")
 	setColumnSizes(t, map[string]int{
 		"Name":    100,
 		"Geodata": 4096,
@@ -47,6 +57,13 @@ func InsertData() {
 
 	Dbm.TraceOn("[gorp]", r.INFO)
 	Dbm.CreateTables()
+
+	bcryptPassword, _ := bcrypt.GenerateFromPassword(
+		[]byte("demo"), bcrypt.DefaultCost)
+	demoUser := &models.User{0, "Demo User", "demo", "demo", bcryptPassword}
+	if err := Dbm.Insert(demoUser); err != nil {
+		panic(err)
+	}
 
 	demoArea := &models.Area{0, "A1",
 		`{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"color":"red"},"geometry":{"type":"Polygon","coordinates":[[[101.67458295822144,3.1290962786081646],[101.67694330215454,3.127125114155911],[101.67750120162964,3.1273822227728822],[101.6785740852356,3.1284106566103684],[101.67887449264526,3.128796319039309],[101.67833805084227,3.129267684037543],[101.67923927307129,3.1302532647123797],[101.67709350585938,3.13222442328034],[101.67563438415527,3.130638926463226],[101.67522668838501,3.1299747311373816],[101.67458295822144,3.1290962786081646]]]}}]}`, 1, "Truck"}
