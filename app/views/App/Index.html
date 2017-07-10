@@ -74,119 +74,136 @@
 <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
     crossorigin=""></script>
 <script type='text/javascript'>
-    var sm = socketManager();
-    sm.init();
-    layers = [];
-    markers = {};
-    var dm = {
-        //attribute
-        center: [3.1290962786081646, 101.67658295822144],
-        zoom: 17,
-        id: "gmapid",
-        map: null,
-        geojson: [],
-        markers: {},
-        urlTileLayer: "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
-        setCenter: function (lat, long, name) {
-            this.map.panTo(new L.LatLng(lat, long));
-            this.markers[name].openPopup();
-        },
-        init: function () {
-            this.map = L.map(this.id, {
-                center: this.center,
-                zoom: this.zoom
-            });
+    $(document).ready(function () {
+        var sm = socketManager();
+        sm.init();
+        layers = [];
+        markers = {};
+        var dm = {
+            //attribute
+            center: [3.1290962786081646, 101.67658295822144],
+            zoom: 17,
+            id: "gmapid",
+            map: null,
+            geojson: [],
+            markers: {},
+            urlTileLayer: "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
+            setCenter: function (lat, long, name) {
+                this.map.panTo(new L.LatLng(lat, long));
+                this.markers[name].openPopup();
+            },
+            init: function () {
+                this.map = L.map(this.id, {
+                    center: this.center,
+                    zoom: this.zoom
+                });
 
-            L.tileLayer(this.urlTileLayer, {
-                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                maxZoom: 18,
-                id: 'mapbox.streets',
-                accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
-            }).addTo(this.map);
+                L.tileLayer(this.urlTileLayer, {
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                    maxZoom: 18,
+                    id: 'mapbox.streets',
+                    accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+                }).addTo(this.map);
 
-            this.markerGroup = L.layerGroup().addTo(this.map);
-        },
-        loadArea: function () {
-            var self = this;
-            $.get("/api/v1/area", function (data) {
-                if (data && data.Areas) {
-                    data.Areas.forEach(function (area) {
-                        sm.sethook("fence." + area.name, area.group, area.geodata);
-                        var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
-                            style: function (feature) {
-                                return { color: feature.properties.color };
-                            },
-                        }).bindPopup(function (layer) {
-                            return self.geojson.feature.properties.description;
+                this.markerGroup = L.layerGroup().addTo(this.map);
+            },
+            loadArea: function () {
+                var self = this;
+                $.get("/api/v1/area", function (data) {
+                    if (data && data.Areas) {
+                        data.Areas.forEach(function (area) {
+                            sm.sethook("fence." + area.name, area.group, area.geodata);
+                            var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
+                                style: function (feature) {
+                                    return { color: feature.properties.color };
+                                },
+                            }).bindPopup(function (layer) {
+                                return self.geojson.feature.properties.description;
+                            });
+                            self.geojson.push(gsonLayer);
+                            gsonLayer.addTo(self.map);
+                        }, this);
+                    }
+                });
+            },
+            loadObject: function () {
+                var self = this;
+                $.get("/api/v1/object", function (data) {
+                    if (data && data.Objects) {
+                        data.Objects.forEach(function (obj) {
+                            self.markers[obj.name] = L.marker([obj.lat, obj.long]).bindPopup(obj.name).addTo(self.markerGroup);
                         });
-                        self.geojson.push(gsonLayer);
-                        gsonLayer.addTo(self.map);
-                    }, this);
+                    }
+                });
+            },
+            updateLocation: function (name, lat, long) {
+                var self = this;
+                if (!self.markers.hasOwnProperty(name)) {
+                    console.log("ra nemu");
+                    return;
                 }
-            });
-        },
-        loadObject: function () {
-            var self = this;
-            $.get("/api/v1/object", function (data) {
-                if (data && data.Objects) {
-                    data.Objects.forEach(function (obj) {
-                        self.markers[obj.name] = L.marker([obj.lat, obj.long]).bindPopup(obj.name).addTo(self.markerGroup);
-                    });
-                }
-            });
-        },
-        updateLocation: function (name, lat, long) {
-            var self = this;
-            if (!self.markers.hasOwnProperty(name)) {
-                console.log("ra nemu");
-                return;
+                var marker = self.markers[name];
+                console.log(marker._leaflet_id);
+                this.markerGroup.remove(marker._leaflet_id);
+                var newLatLng = new L.LatLng(lat, long);
+                marker.setLatLng([lat, long]).addTo(self.markerGroup);
+            },
+            updateLocation: function () {
+                this.markerGroup.clearLayers();
+                this.loadObject();
             }
-            var marker = self.markers[name];
-            console.log(marker._leaflet_id);
-            this.markerGroup.remove(marker._leaflet_id);
-            var newLatLng = new L.LatLng(lat, long);
-            marker.setLatLng([lat, long]).addTo(self.markerGroup);
-        },
-        updateLocation: function () {
-            this.markerGroup.clearLayers();
-            this.loadObject();
+        };
+        dm.init();
+        dm.loadArea();
+        dm.loadObject();
+
+        sm.onPosition = function (data) {
+            dm.updateLocation(data.name, data.lat, data.long);
+            //dm.loadObject();
+            dm.updateLocation();
+        };
+
+        function debounce(fn, delay) {
+            var timer = null;
+            return function () {
+                var context = this, args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    fn.apply(context, args);
+                }, delay);
+            };
         }
-    };
-    dm.init();
-    dm.loadArea();
-    dm.loadObject();
-
-    sm.onPosition = function (data) {
-        dm.updateLocation(data.name, data.lat, data.long);
-        //dm.loadObject();
-        dm.updateLocation();
-    };
-
-    function debounce(fn, delay) {
         var timer = null;
-        return function () {
-            var context = this, args = arguments;
+        sm.onResult = function (result) {
             clearTimeout(timer);
             timer = setTimeout(function () {
-                fn.apply(context, args);
-            }, delay);
+                if (result.data) {
+                    var data = JSON.parse(result.data);
+                    console.log(data);
+                    switch(data.detect){
+                        case "enter":notify("Enter", data.key +" "+data.id+" enter geofece area", "success");break;
+                        case "exit":notify("Exit", data.key +" "+data.id+" exit geofece area", "info");break;
+                        case "outside":notify("Outside", data.key +" "+data.id+" outside geofece area", "warning");break;
+                        case "inside":notify("Inside", data.key +" "+data.id+" inside geofece area", "warning");break;
+                    }
+                }
+            }, 1000);
         };
-    }
-    var timer = null;
-    sm.onResult = function (result) {
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-            if (result.data) {
-                var data = JSON.parse(result.data);
-                console.log(data);
-            }
-        }, 1000);
-    };
 
-    $('.setCenter').click(function (e) {
-        e.preventDefault();
-        var target = $(e.target);
-        dm.setCenter(target.attr("lat"), target.attr("long"), target.attr("name"));
+        function notify(title, text, type){
+            new PNotify({
+                title: title,
+                text: text,
+                type: type
+            });
+        }
+
+        $('.setCenter').click(function (e) {
+            e.preventDefault();
+            var target = $(e.target);
+            dm.setCenter(target.attr("lat"), target.attr("long"), target.attr("name"));
+        });
     });
+
 </script>
 {{template "footer.html" .}}

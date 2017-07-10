@@ -72,7 +72,7 @@ func initPubSub() {
 func SetObject(name, group string, lat, long float64) {
 	c := tile38Pool.Get()
 	defer c.Close()
-	fmt.Printf("SET %s %s POINT %d %d", group, name, lat, long)
+	fmt.Printf("SET %s %s POINT %f %f", group, name, lat, long)
 	ret, err := c.Do("SET", group, name, "POINT", lat, long)
 	if err != nil {
 		fmt.Printf("%v -- %v", ret, err)
