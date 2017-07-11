@@ -21,7 +21,7 @@ var (
 func InitDB() {
 	db.Init()
 	Dbm = &gorp.DbMap{Db: db.Db, Dialect: gorp.PostgresDialect{}}
-	InsertData()
+	//InsertData()
 }
 
 func InsertData() {
