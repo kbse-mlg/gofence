@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"fmt"
+
 	"github.com/kbse-mlg/gofence/app/models"
 	"github.com/revel/revel"
 )
@@ -13,8 +15,8 @@ type Area struct {
 }
 
 func (c Area) Index() revel.Result {
-	moreStyles := []string{"public/css/leaflet.css"}
-	moreScripts := []string{"public/js/leaflet.js"}
+	moreStyles := []string{"/public/css/leaflet.css"}
+	moreScripts := []string{"/public/js/leaflet.js"}
 	IsAreas := true
 
 	results, err := c.Txn.Select(models.Area{},
@@ -30,6 +32,20 @@ func (c Area) Index() revel.Result {
 	}
 
 	return c.Render(moreScripts, moreStyles, IsAreas, areas)
+}
+
+func (c Area) Edit(id int64) revel.Result {
+	moreStyles := []string{"/public/css/leaflet.css"}
+	moreScripts := []string{"/public/js/leaflet.js"}
+	IsAreas := true
+	var area *models.Area
+	err := c.Txn.SelectOne(&area, `select * from "Area" WHERE "AreaID"=$1 LIMIT 1`, id)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.Flash.Error(err.Error())
+	}
+
+	return c.Render(moreScripts, moreStyles, IsAreas, area)
 }
 
 func (c Area) List(search string, size, page int) revel.Result {

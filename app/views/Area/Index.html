@@ -1,4 +1,4 @@
-{{set . "title" "Home"}} {{template "header.html" .}}
+{{set . "title" "List Area"}} {{template "header.html" .}}
 
 
 <aside class="right-side">
@@ -40,8 +40,8 @@
                                     <thead>
                                         <tr>
                                             <th>Name</th>
+                                            <th>Group</th>
                                             <th>Geodata</th>
-                                            <th>Type</th>
                                             <th>Edit</th>
                                             <th>Delete</th>
                                         </tr>
@@ -50,11 +50,11 @@
                                         {{range .areas}}
                                         <tr>
                                             <td>{{.Name}}</td>
+                                            <th>{{.Group}}</th>
                                             <td>{{.Geodata}}</td>
-                                            <td>{{.Type}}</td>
                                             <td>
                                                 <p>
-                                                    <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#edit" data-placement="top"><span class="fa fa-fw ti-pencil"></span></button>
+                                                    <a href="{{url "Area.Edit" .AreaID}}" class="btn btn-primary btn-xs" data-placement="top"><span class="fa fa-fw ti-pencil"></span></a>
                                                 </p>
                                             </td>
                                             <td>

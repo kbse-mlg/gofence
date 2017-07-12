@@ -8,6 +8,7 @@ module:testrunner
 
 GET     /                                        App.Index
 GET     /areas                                   Area.Index
+GET     /areas/:id                               Area.Edit
 GET     /objects                                 Object.Index
 
 # WebSocket demo
