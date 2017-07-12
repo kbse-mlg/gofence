@@ -27,5 +27,6 @@ GET     /public/*filepath                       Static.Serve("public")
 # API
 
 GET     /api/v1/area                            Area.ListJson
+GET     /api/v1/area/:id                        Area.GetJson
 GET     /api/v1/object                          Object.ListJson
 POST    /api/v1/location/:name                  Object.UpdatePosition

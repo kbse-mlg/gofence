@@ -65,6 +65,7 @@
                                         </label>
                                         <div class="col-md-10">
                                             <div id="gmapid" class="gmap" style="max-height: 600px; height:600px"></div>
+                                            <input type="text" class="form-control" placeholder="Geodata" id="geodata" Name="Geodata" value="{{.area.Geodata}}" hidden>
                                         </div>
                                     </div>
                                 </div>
@@ -158,14 +159,12 @@ $(document).ready(function () {
                     });
 
                     L.NewPolygonControl = L.EditControl.extend({
-
                         options: {
                             position: 'topleft',
                             callback: self.map.editTools.startPolygon,
                             kind: 'polygon',
                             html: '▰'
                         }
-
                     });
                     var deleteShape = function (e) {
                         if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) this.editor.deleteShapeAt(e.latlng);
@@ -188,8 +187,7 @@ $(document).ready(function () {
                             //     pol.addTo(self.map);
                             //     pol.enableEdit();
                             //     console.log(pol);
-                            // });
-                            
+                            // });  
                             var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
                                 onEachFeature:function(feature, layer) {
                                     layer.on('dblclick', function(e){
@@ -201,6 +199,10 @@ $(document).ready(function () {
                                 draggable: true,
                                 editable:true
                             });
+                            gsonLayer.on('pm:edit', function(e) {
+                                console.log(e, e.target._layers, gsonLayer.getLayer());
+                            });
+
                             self.geojson.push(gsonLayer);
                         }, this);
                     }

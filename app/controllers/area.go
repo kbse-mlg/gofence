@@ -137,3 +137,11 @@ func (c Area) Show(id int) revel.Result {
 	title := Area.Name
 	return c.Render(title, Area)
 }
+
+func (c Area) GetJson(id int) revel.Result {
+	Area := c.loadAreaById(id)
+	if Area == nil {
+		return c.NotFound("Area %d does not exist", id)
+	}
+	return c.RenderJSON(Area)
+}
