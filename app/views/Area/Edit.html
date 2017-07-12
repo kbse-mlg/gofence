@@ -108,7 +108,8 @@ $(document).ready(function () {
             init: function () {
                 this.map = L.map(this.id, {
                     center: this.center,
-                    zoom: this.zoom
+                    zoom: this.zoom,
+                    editable: true
                 });
 
                 L.tileLayer(this.urlTileLayer, {
@@ -119,21 +120,88 @@ $(document).ready(function () {
                 }).addTo(this.map);
 
                 this.markerGroup = L.layerGroup().addTo(this.map);
+                //this.initControl();
+
+                this.map.on('pm:create', function(e) {
+                    alert('pm:create event fired. See console for details');
+                    console.log(e);
+                });
+                // this.map.pm.addControls();
+                // this.map.pm.enableDraw('Poly');
+            },
+            initControl:function(){
+                var self = this;
+                L.EditControl = L.Control.extend({
+
+                        options: {
+                            position: 'topleft',
+                            callback: null,
+                            kind: '',
+                            html: ''
+                        },
+
+                        onAdd: function (map) {
+                            var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar'),
+                                link = L.DomUtil.create('a', '', container);
+
+                            link.href = '#';
+                            link.title = 'Create a new ' + this.options.kind;
+                            link.innerHTML = this.options.html;
+                            L.DomEvent.on(link, 'click', L.DomEvent.stop)
+                                    .on(link, 'click', function () {
+                                        window.LAYER = this.options.callback.call(map.editTools);
+                                    }, this);
+
+                            return container;
+                        }
+
+                    });
+
+                    L.NewPolygonControl = L.EditControl.extend({
+
+                        options: {
+                            position: 'topleft',
+                            callback: self.map.editTools.startPolygon,
+                            kind: 'polygon',
+                            html: '▰'
+                        }
+
+                    });
+                    var deleteShape = function (e) {
+                        if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) this.editor.deleteShapeAt(e.latlng);
+                    };
+                    self.map.on('layeradd', function (e) {
+                        if (e.layer instanceof L.Path) e.layer.on('click', L.DomEvent.stop).on('click', deleteShape, e.layer);
+                        if (e.layer instanceof L.Path) e.layer.on('dblclick', L.DomEvent.stop).on('dblclick', e.layer.toggleEdit);
+                    });
+
+                    self.map.addControl(new L.NewPolygonControl());
             },
             loadArea: function () {
                 var self = this;
                 $.get("/api/v1/area", function (data) {
                     if (data && data.Areas) {
                         data.Areas.forEach(function (area) {
+                            // var geoj = JSON.parse(area.geodata);
+                            // geoj.features.forEach(function(g){
+                            //     var pol = L.polygon(g.geometry.coordinates);
+                            //     pol.addTo(self.map);
+                            //     pol.enableEdit();
+                            //     console.log(pol);
+                            // });
+                            
                             var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
-                                style: function (feature) {
-                                    return { color: feature.properties.color };
+                                onEachFeature:function(feature, layer) {
+                                    layer.on('dblclick', function(e){
+                                        e.target.editing.enable();
+                                    });
                                 },
-                            }).bindPopup(function (layer) {
-                                return self.geojson.feature.properties.description;
+                            }).addTo(self.map);
+                            gsonLayer.pm.toggleEdit({
+                                draggable: true,
+                                editable:true
                             });
                             self.geojson.push(gsonLayer);
-                            gsonLayer.addTo(self.map);
                         }, this);
                     }
                 });

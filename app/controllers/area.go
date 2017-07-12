@@ -35,8 +35,8 @@ func (c Area) Index() revel.Result {
 }
 
 func (c Area) Edit(id int64) revel.Result {
-	moreStyles := []string{"/public/css/leaflet.css"}
-	moreScripts := []string{"/public/js/leaflet.js"}
+	moreStyles := []string{"/public/css/leaflet.css", "/public/css/leaflet.pm.css"}
+	moreScripts := []string{"/public/js/leaflet.js", "/public/js/leaflet.pm.min.js", "https://cdnjs.cloudflare.com/ajax/libs/leaflet-editable/1.0.0/Leaflet.Editable.min.js"}
 	IsAreas := true
 	var area *models.Area
 	err := c.Txn.SelectOne(&area, `select * from "Area" WHERE "AreaID"=$1 LIMIT 1`, id)
