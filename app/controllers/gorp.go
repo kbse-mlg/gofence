@@ -21,24 +21,20 @@ var (
 func InitDB() {
 	db.Init()
 	Dbm = &gorp.DbMap{Db: db.Db, Dialect: gorp.PostgresDialect{}}
-	//InsertData()
-}
-
-func InsertData() {
 	setColumnSizes := func(t *gorp.TableMap, colSizes map[string]int) {
 		for col, size := range colSizes {
 			t.ColMap(col).MaxSize = size
 		}
 	}
 
-	t := Dbm.AddTable(models.User{}).SetKeys(true, "UserID")
+	t := Dbm.AddTableWithName(models.User{}, "User").SetKeys(true, "UserID")
 	t.ColMap("Password").Transient = true
 	setColumnSizes(t, map[string]int{
 		"Username": 20,
 		"Name":     100,
 	})
 
-	t = Dbm.AddTable(models.Area{}).SetKeys(true, "AreaID")
+	t = Dbm.AddTableWithName(models.Area{}, "Area").SetKeys(true, "AreaID")
 	setColumnSizes(t, map[string]int{
 		"Name":    100,
 		"Geodata": 4096,
@@ -46,7 +42,7 @@ func InsertData() {
 		"Group":   100,
 	})
 
-	t = Dbm.AddTable(models.Object{}).SetKeys(true, "ObjectID")
+	t = Dbm.AddTableWithName(models.Object{}, "Object").SetKeys(true, "ObjectID")
 	setColumnSizes(t, map[string]int{
 		"Name":  100,
 		"Group": 100,
@@ -57,7 +53,10 @@ func InsertData() {
 
 	Dbm.TraceOn("[gorp]", r.INFO)
 	Dbm.CreateTables()
+	// InsertData()
+}
 
+func InsertData() {
 	bcryptPassword, _ := bcrypt.GenerateFromPassword(
 		[]byte("demo"), bcrypt.DefaultCost)
 	demoUser := &models.User{0, "Demo User", "demo", "demo", bcryptPassword}
@@ -72,7 +71,8 @@ func InsertData() {
 	}
 
 	objects := []*models.Object{
-		&models.Object{0, "A1", "truck", 101.67458295822144, 3.1290962786081646, 1},
+		&models.Object{0, "Truck", "A1", 101.67458295822144, 3.1290962786081646, 1},
+		&models.Object{0, "Truck", "A2", 101.67478295822144, 3.1290962786081646, 1},
 	}
 
 	for _, obj := range objects {

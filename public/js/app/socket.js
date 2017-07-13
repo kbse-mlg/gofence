@@ -68,12 +68,15 @@ var socketManager = function(){
             var data =  { cmd:POSITION, name:name, group:group, lat:lat, long:long};
             this.send(data);
         },
-        socketConnected:function(){
+        socketConnected:function(fn){
             // var data = {
             //     cmd:"position",
             //     data:"oke bos"
             // };
             // this.send(data);
+            if(fn){
+                fn();
+            }
         },
         onPosition:null,
         onResult:null,

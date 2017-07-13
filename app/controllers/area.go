@@ -6,7 +6,9 @@ import (
 
 	"fmt"
 
+	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/kbse-mlg/gofence/app/models"
+	"github.com/kbse-mlg/gofence/app/routes"
 	"github.com/revel/revel"
 )
 
@@ -119,14 +121,26 @@ func loadAreas(results []interface{}, err error) []*models.Area {
 }
 
 func (c Area) loadAreaById(id int) *models.Area {
-	h, err := c.Txn.Get(models.Area{}, id)
+	// var area *models.Area
+	// err := c.Txn.SelectOne(&area, `SELECT * FROM "Area" WHERE "AreaID"=$1`, id)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// if area == nil {
+	// 	return nil
+	// }
+	// return area
+
+	area, err := c.Txn.Get(models.Area{}, id)
 	if err != nil {
 		panic(err)
 	}
-	if h == nil {
+
+	if area == nil {
 		return nil
 	}
-	return h.(*models.Area)
+
+	return area.(*models.Area)
 }
 
 func (c Area) Show(id int) revel.Result {
@@ -144,4 +158,28 @@ func (c Area) GetJson(id int) revel.Result {
 		return c.NotFound("Area %d does not exist", id)
 	}
 	return c.RenderJSON(Area)
+}
+
+func (c Area) ConfirmEdit(id int) revel.Result {
+	area := c.loadAreaById(id)
+	if area == nil {
+		return c.NotFound("Area %d does not exist", id)
+	}
+
+	geodata := c.Params.Form.Get("geodata")
+	group := c.Params.Form.Get("group")
+
+	area.Geodata = geodata
+	area.Group = group
+
+	// fmt.Println(geodata, group, area)
+	// _, err := c.Txn.Query(`Update "Area" Set "Geodata"=$1, "Group"=$2 Where "AreaID"=$3`, geodata, group, id)
+	_, err := c.Txn.Update(area)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	geofence.SetFenceHook(area.Name, area.Group, area.Geodata, ":6379")
+
+	return c.Redirect(routes.Area.Index())
 }

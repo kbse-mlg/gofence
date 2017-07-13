@@ -154,6 +154,12 @@
             }
         };
         dm.init();
+
+        sm.socketConnected(function(){
+            dm.loadArea();
+            dm.loadObject();
+        });
+
         dm.loadArea();
         dm.loadObject();
 

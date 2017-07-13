@@ -40,15 +40,16 @@
                                     <i class="fa fa-fw ti-angle-up clickable"></i>
                                 </span>-->
                         </div>
+                            <input type="hidden" id="AreaID" value="{{.area.AreaID}}">
                         <div class="panel-body">
-                          <form action="#" class="form-horizontal">
+                          <form method="POST" action="{{url "Area.ConfirmEdit" .area.AreaID}}" class="form-horizontal">
                                 <div class="form-body">
                                     <div class="form-group">
                                         <label for="name" class="col-md-2 control-label">
                                             Name
                                         </label>
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control" placeholder="Name" id="name" name="Group" value="{{.area.Name}}" disabled>
+                                            <input type="text" class="form-control" placeholder="Name" id="name" name="name" value="{{.area.Name}}" disabled>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -56,7 +57,7 @@
                                             Group
                                         </label>
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control" placeholder="Group" id="group" Name="Group" value="{{.area.Group}}">
+                                            <input type="text" class="form-control" placeholder="Group" id="group" Name="group" value="{{.area.Group}}">
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -65,15 +66,14 @@
                                         </label>
                                         <div class="col-md-10">
                                             <div id="gmapid" class="gmap" style="max-height: 600px; height:600px"></div>
-                                            <input type="text" class="form-control" placeholder="Geodata" id="geodata" Name="Geodata" value="{{.area.Geodata}}" hidden>
+                                            <input type="hidden" class="form-control" placeholder="Geodata" id="geodata" Name="geodata" value="{{.area.Geodata}}">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-actions">
                                     <div class="row">
                                         <div class="col-md-offset-2 col-md-10">
-                                            <button type="button" class="btn btn-primary">Submit
-                                            </button>
+                                            <input type="submit" class="btn btn-primary"></input>
                                             &nbsp;
                                             <button type="button" class="btn btn-danger" onclick="window.history.back()">Cancel
                                             </button>
@@ -178,34 +178,37 @@ $(document).ready(function () {
             },
             loadArea: function () {
                 var self = this;
-                $.get("/api/v1/area", function (data) {
-                    if (data && data.Areas) {
-                        data.Areas.forEach(function (area) {
-                            // var geoj = JSON.parse(area.geodata);
-                            // geoj.features.forEach(function(g){
-                            //     var pol = L.polygon(g.geometry.coordinates);
-                            //     pol.addTo(self.map);
-                            //     pol.enableEdit();
-                            //     console.log(pol);
-                            // });  
-                            var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
-                                onEachFeature:function(feature, layer) {
-                                    layer.on('dblclick', function(e){
-                                        e.target.editing.enable();
-                                    });
-                                },
-                            }).addTo(self.map);
-                            gsonLayer.pm.toggleEdit({
-                                draggable: true,
-                                editable:true
+                var id = $("#AreaID").val();
+                $.get("/api/v1/area/"+id, function (area) {
+                    // var geoj = JSON.parse(area.geodata);
+                    // geoj.features.forEach(function(g){
+                    //     var pol = L.polygon(g.geometry.coordinates);
+                    //     pol.addTo(self.map);
+                    //     pol.enableEdit();
+                    //     console.log(pol);
+                    // });  
+                    var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
+                        onEachFeature:function(feature, layer) {
+                            layer.on('dblclick', function(e){
+                                e.target.editing.enable();
                             });
-                            gsonLayer.on('pm:edit', function(e) {
-                                console.log(e, e.target._layers, gsonLayer.getLayer());
-                            });
+                        },
+                    }).addTo(self.map);
+                    gsonLayer.pm.toggleEdit({
+                        draggable: true,
+                        editable:true
+                    });
+                    gsonLayer.on('pm:edit', function(e) {
+                        console.log(e, e.target._layers, this.pm._layers);
+                        for (var key in e.target._layers) {
+                            if (e.target._layers.hasOwnProperty(key)) {
+                                console.log(key + " -> " + JSON.stringify(e.target._layers[key].toGeoJSON()));
+                                $("#geodata").val(JSON.stringify(e.target._layers[key].toGeoJSON()));
+                            }
+                        }
+                    });
 
-                            self.geojson.push(gsonLayer);
-                        }, this);
-                    }
+                    self.geojson.push(gsonLayer);
                 });
             },
             updateLocation: function (name, lat, long) {

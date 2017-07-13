@@ -42,8 +42,8 @@
                                             <th>Name</th>
                                             <th>Group</th>
                                             <th>Geodata</th>
-                                            <th>Edit</th>
-                                            <th>Delete</th>
+                                            <th>Action</th>
+                                            <!-- <th>Delete</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -56,11 +56,9 @@
                                                 <p>
                                                     <a href="{{url "Area.Edit" .AreaID}}" class="btn btn-primary btn-xs" data-placement="top"><span class="fa fa-fw ti-pencil"></span></a>
                                                 </p>
-                                            </td>
-                                            <td>
-                                                <p>
-                                                    <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#delete" data-placement="top"><span class="fa fa-fw ti-trash"></span></button>
-                                                </p>
+                                                <!-- <p>
+                                                    <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#delete" data-placement="top" onclick="alert('Not implemented yet')"><span class="fa fa-fw ti-trash"></span></button>
+                                                </p> -->
                                             </td>
                                         </tr>
                                         {{end}}
