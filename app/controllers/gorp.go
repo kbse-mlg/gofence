@@ -60,6 +60,7 @@ func InitDB() {
 
 	Dbm.TraceOn("[gorp]", r.INFO)
 	Dbm.CreateTables()
+	InsertData()
 
 	// Dummy Moving
 	ticker := time.NewTicker(5 * time.Second)
@@ -84,7 +85,9 @@ func InitDB() {
 					direction = 4
 				} else {
 					direction = 1
-					counter = counter % max
+					counter = 0
+					a1 = Coord{Lat: 3.1270, Long: 101.6772}
+					a2 = Coord{Lat: 3.1299, Long: 101.6738}
 				}
 				counter++
 				// do stuff
