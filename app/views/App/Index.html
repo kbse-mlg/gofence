@@ -180,20 +180,26 @@
             };
         }
         var timer = null;
+        var code = "";
         sm.onResult = function (result) {
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-                if (result.data) {
-                    var data = JSON.parse(result.data);
-                    console.log(data);
-                    switch(data.detect){
-                        case "enter":notify("Enter", data.key +" "+data.id+" enter geofece area", "success");break;
-                        case "exit":notify("Exit", data.key +" "+data.id+" exit geofece area", "info");break;
-                        case "outside":notify("Outside", data.key +" "+data.id+" outside geofece area", "warning");break;
-                        case "inside":notify("Inside", data.key +" "+data.id+" inside geofece area", "warning");break;
-                    }
+            console.log(result);
+            if (result.data) {
+                var data = JSON.parse(result.data);
+                if(data.id==code){
+                    clearTimeout(timer);
                 }
-            }, 1000);
+                
+                timer = setTimeout(function () {
+                    
+                        console.log(data);
+                        switch(data.detect){
+                            case "enter":notify("Enter", data.key +" "+data.id+" enter geofence area", "success");break;
+                            case "exit":notify("Exit", data.key +" "+data.id+" exit geofence area", "info");break;
+                            case "outside":notify("Outside", data.key +" "+data.id+" outside geofence area", "warning");break;
+                            case "inside":notify("Inside", data.key +" "+data.id+" inside geofence area", "warning");break;
+                        }
+                }, 900);
+            }
         };
 
         function notify(title, text, type){

@@ -179,7 +179,7 @@ func (c Area) ConfirmEdit(id int) revel.Result {
 		fmt.Println(err.Error())
 	}
 
-	geofence.SetFenceHook(area.Name, area.Group, area.Geodata, ":6379")
+	geofence.SetFenceHook(area.Name, area.Group, area.Geodata, ":9851")
 
 	return c.Redirect(routes.Area.Index())
 }

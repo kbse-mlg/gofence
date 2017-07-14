@@ -74,7 +74,7 @@ var socketManager = function(){
             //     data:"oke bos"
             // };
             // this.send(data);
-            if(fn){
+            if(typeof fn === "function"){
                 fn();
             }
         },

@@ -83,7 +83,7 @@ func SetObject(name, group string, lat, long float64) {
 func SetFenceHook(name, group, geojson, redisAddress string) {
 	c := tile38Pool.Get()
 	defer c.Close()
-	fmt.Println(group, geojson)
+	fmt.Println("SET HOOK",group, geojson)
 	ret, err := c.Do("SETHOOK", name, fmt.Sprintf(redisHookTemplate, redisAddress, name), "WITHIN", group, "FENCE", "OBJECT", geojson)
 	if err != nil {
 		fmt.Printf("%v -- %v", ret, err)
