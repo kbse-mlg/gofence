@@ -60,7 +60,7 @@ func InitDB() {
 
 	Dbm.TraceOn("[gorp]", r.INFO)
 	Dbm.CreateTables()
-	InsertData()
+	//InsertData()
 
 	// Dummy Moving
 	ticker := time.NewTicker(5 * time.Second)
