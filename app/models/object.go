@@ -3,17 +3,21 @@ package models
 import (
 	"fmt"
 	"regexp"
+	"time"
 
+	"github.com/go-gorp/gorp"
 	"github.com/revel/revel"
 )
 
 type Object struct {
-	ObjectID int     `json:"object_id"`
+	ObjectID int     `json:"id"`
 	Group    string  `json:"group"`
 	Name     string  `json:"name"`
 	Long     float64 `json:"long"`
 	Lat      float64 `json:"lat"`
 	Type     int     `json:"type"`
+	Created  int64   `json:"created"`
+	Modified int64   `json:"modified"`
 }
 
 func (u *Object) String() string {
@@ -21,6 +25,27 @@ func (u *Object) String() string {
 }
 
 var nameRegex = regexp.MustCompile("^\\w*$")
+
+func (obj *Object) PostUpdate(exe gorp.SqlExecutor) error {
+	history := MoveHistory{
+		ObjectID: obj.ObjectID,
+		Long:     obj.Long,
+		Lat:      obj.Lat,
+		Created:  time.Now().UnixNano(),
+	}
+	return exe.Insert(&history)
+}
+
+func (obj *Object) PreInsert(_ gorp.SqlExecutor) error {
+	obj.Created = time.Now().UnixNano()
+	obj.Modified = obj.Created
+	return nil
+}
+
+func (obj *Object) PreUpdate(_ gorp.SqlExecutor) error {
+	obj.Modified = time.Now().UnixNano()
+	return nil
+}
 
 func (obj *Object) Validate(v *revel.Validation) {
 	v.Check(obj.Name,

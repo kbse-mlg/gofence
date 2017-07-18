@@ -1,13 +1,16 @@
 package controllers
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
+	"time"
 
 	"fmt"
 
 	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/kbse-mlg/gofence/app/models"
+	"github.com/kbse-mlg/gofence/app/modules/json"
 	"github.com/kbse-mlg/gofence/app/routes"
 	"github.com/revel/revel"
 )
@@ -158,6 +161,45 @@ func (c Area) GetJson(id int) revel.Result {
 		return c.NotFound("Area %d does not exist", id)
 	}
 	return c.RenderJSON(Area)
+}
+
+func (c Area) SetHook(id int) revel.Result {
+	area := c.loadAreaById(id)
+	if area == nil {
+		return c.RenderJSON(json.ERROR(fmt.Sprintf("Area %d does not exist", id)))
+	}
+	area.Active = !area.Active
+	_, err := c.Txn.Update(area)
+	if err != nil {
+		return c.RenderJSON(err.Error())
+	}
+	if area.Active == true {
+		geofence.SetFenceHook(area.Name, area.Group, area.Geodata, "")
+	} else {
+		geofence.DeleteHook(area.Name)
+	}
+
+	return c.RenderJSON(json.OK())
+}
+
+func (c Area) ConfirmAdd() revel.Result {
+
+	geodata := c.Params.Form.Get("geodata")
+	group := c.Params.Form.Get("group")
+	name := c.Params.Form.Get("name")
+
+	now := time.Now().UnixNano()
+	area := models.Area{0, name, geodata, 1, group, true, now, now}
+
+	// fmt.Println(geodata, group, area)
+	err := c.Txn.Insert(area)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	geofence.SetFenceHook(area.Name, area.Group, area.Geodata, ":9851")
+
+	return c.Redirect(routes.Area.Index())
 }
 
 func (c Area) ConfirmEdit(id int) revel.Result {

@@ -49,8 +49,21 @@ func initPubSub() {
 	for {
 		c := redispool.Get()
 		defer c.Close()
+
+		// ct := tile38Pool.Get()
+		// defer ct.Close()
+
 		psc := redis.PubSubConn{Conn: c}
 		psc.PSubscribe("fence.*")
+
+		// experiment keep alive redis
+		// go func() {
+		// 	for {
+		// 		c.Do("PING")
+		// 		ct.Do("PING")
+		// 		time.Sleep(20 * time.Second)
+		// 	}
+		// }()
 
 		for c.Err() == nil {
 			switch v := psc.Receive().(type) {
@@ -69,43 +82,58 @@ func initPubSub() {
 }
 
 // SetObject set object name
-func SetObject(name, group string, lat, long float64) {
+func SetObject(name, group string, lat, long float64) error {
 	c := tile38Pool.Get()
 	defer c.Close()
 	fmt.Printf("SET %s %s POINT %f %f", group, name, lat, long)
 	ret, err := c.Do("SET", group, name, "POINT", lat, long)
 	if err != nil {
 		fmt.Printf("%v -- %v", ret, err)
+		return err
 	}
+
+	return nil
 }
 
 // SetFenceHook set webhook to redis
-func SetFenceHook(name, group, geojson, redisAddress string) {
+func SetFenceHook(name, group, geojson, redisAddress string) error {
+	if redisAddress == "" {
+		redisAddress = ":9851"
+	}
+
 	c := tile38Pool.Get()
 	defer c.Close()
-	fmt.Println("SET HOOK",group, geojson)
+	fmt.Println("SET HOOK", group, geojson)
 	ret, err := c.Do("SETHOOK", name, fmt.Sprintf(redisHookTemplate, redisAddress, name), "WITHIN", group, "FENCE", "OBJECT", geojson)
 	if err != nil {
 		fmt.Printf("%v -- %v", ret, err)
+		return err
 	}
+
+	return nil
 }
 
 // DelFenceHook delete webhook to redis
-func DelFenceHook(name string) {
+func DelFenceHook(name string) error {
 	c := tile38Pool.Get()
 	defer c.Close()
 	ret, err := c.Do("DELHOOK", name)
 	if err != nil {
 		fmt.Printf("%d -- %v", ret, err)
+		return err
 	}
+	return nil
 }
 
 // DelAllHook delete all webhook to redis
-func DelAllHook() {
+func DelAllHook() error {
 	c := tile38Pool.Get()
 	defer c.Close()
 	ret, err := c.Do("PDELHOOK", "*")
 	if err != nil {
 		fmt.Printf("%d -- %v", ret, err)
+		return err
 	}
+
+	return nil
 }
