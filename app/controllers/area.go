@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"strconv"
 	"strings"
 	"time"
@@ -10,7 +9,7 @@ import (
 
 	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/kbse-mlg/gofence/app/models"
-	"github.com/kbse-mlg/gofence/app/modules/json"
+	"github.com/kbse-mlg/gofence/app/modules/response"
 	"github.com/kbse-mlg/gofence/app/routes"
 	"github.com/revel/revel"
 )
@@ -37,6 +36,14 @@ func (c Area) Index() revel.Result {
 	}
 
 	return c.Render(moreScripts, moreStyles, IsAreas, areas)
+}
+
+func (c Area) New() revel.Result {
+	moreStyles := []string{"/public/css/leaflet.css", "/public/css/leaflet.pm.css"}
+	moreScripts := []string{"/public/js/leaflet.js", "/public/js/leaflet.pm.min.js", "https://cdnjs.cloudflare.com/ajax/libs/leaflet-editable/1.0.0/Leaflet.Editable.min.js"}
+	IsAreas := true
+
+	return c.Render(moreScripts, moreStyles, IsAreas)
 }
 
 func (c Area) Edit(id int64) revel.Result {
@@ -166,12 +173,12 @@ func (c Area) GetJson(id int) revel.Result {
 func (c Area) SetHook(id int) revel.Result {
 	area := c.loadAreaById(id)
 	if area == nil {
-		return c.RenderJSON(json.ERROR(fmt.Sprintf("Area %d does not exist", id)))
+		return c.RenderJSON(response.ERROR(fmt.Sprintf("Area %d does not exist", id)))
 	}
 	area.Active = !area.Active
 	_, err := c.Txn.Update(area)
 	if err != nil {
-		return c.RenderJSON(err.Error())
+		return c.RenderJSON(response.ERROR(err.Error()))
 	}
 	if area.Active == true {
 		geofence.SetFenceHook(area.Name, area.Group, area.Geodata, "")
@@ -179,10 +186,10 @@ func (c Area) SetHook(id int) revel.Result {
 		geofence.DeleteHook(area.Name)
 	}
 
-	return c.RenderJSON(json.OK())
+	return c.RenderJSON(response.OK())
 }
 
-func (c Area) ConfirmAdd() revel.Result {
+func (c Area) ConfirmNew() revel.Result {
 
 	geodata := c.Params.Form.Get("geodata")
 	group := c.Params.Form.Get("group")

@@ -1,0 +1,236 @@
+{{set . "title" "Edit Area"}} 
+{{template "header.html" .}}
+
+
+<aside class="right-side">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Geofence Area
+        </h1>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">
+                        <i class="fa fa-fw ti-widgetized"></i> Data
+                    </a>
+            </li>
+            <li class="active">
+                <a href="/areas">
+                    Area
+                </a>
+            </li>
+            <li class="active">
+                Edit
+            </li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <!-- row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- Basic charts strats here-->
+                <div class="col-lg-12">
+                    <div class="panel ">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <i class="ti-list"></i> Edit Area
+                            </h3>
+                            <!--<span class="pull-right">
+                                    <i class="fa fa-fw ti-angle-up clickable"></i>
+                                </span>-->
+                        </div>
+                        <div class="panel-body">
+                          <form method="POST" action="{{url "Area.ConfirmNew" }}" class="form-horizontal">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label for="name" class="col-md-2 control-label">
+                                            Name
+                                        </label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" placeholder="Name" id="name" name="name">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="group" class="col-md-2 control-label">
+                                            Group
+                                        </label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" placeholder="Group" id="group" Name="group">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="geodata" class="col-md-2 control-label">
+                                            Geodata
+                                        </label>
+                                        <div class="col-md-10">
+                                            <div id="gmapid" class="gmap" style="max-height: 600px; height:600px"></div>
+                                            <input type="hidden" class="form-control" placeholder="Geodata" id="geodata" Name="geodata" value="">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-2 col-md-10">
+                                            <input type="submit" class="btn btn-primary"></input>
+                                            &nbsp;
+                                            <button type="button" class="btn btn-danger" onclick="window.history.back()">Cancel
+                                            </button>
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- row -->
+    </section>
+</aside>
+<script>
+$(document).ready(function () {
+        layers = [];
+        markers = {};
+        var dm = {
+            //attribute
+            center: [3.1290962786081646, 101.67658295822144],
+            zoom: 17,
+            id: "gmapid",
+            map: null,
+            geojson: [],
+            markers: {},
+            urlTileLayer: "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
+            setCenter: function (lat, long, name) {
+                this.map.panTo(new L.LatLng(lat, long));
+                this.markers[name].openPopup();
+            },
+            init: function () {
+                this.map = L.map(this.id, {
+                    center: this.center,
+                    zoom: this.zoom,
+                    editable: true
+                });
+
+                L.tileLayer(this.urlTileLayer, {
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                    maxZoom: 18,
+                    id: 'mapbox.streets',
+                    accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+                }).addTo(this.map);
+
+                this.markerGroup = L.layerGroup().addTo(this.map);
+                //this.initControl();
+
+                this.map.on('pm:create', function(e) {
+                    alert('pm:create event fired. See console for details');
+                    console.log(e);
+                });
+                // this.map.pm.addControls();
+                this.map.pm.enableDraw('Poly');
+            },
+            initControl:function(){
+                var self = this;
+                L.EditControl = L.Control.extend({
+
+                        options: {
+                            position: 'topleft',
+                            callback: null,
+                            kind: '',
+                            html: ''
+                        },
+
+                        onAdd: function (map) {
+                            var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar'),
+                                link = L.DomUtil.create('a', '', container);
+
+                            link.href = '#';
+                            link.title = 'Create a new ' + this.options.kind;
+                            link.innerHTML = this.options.html;
+                            L.DomEvent.on(link, 'click', L.DomEvent.stop)
+                                    .on(link, 'click', function () {
+                                        window.LAYER = this.options.callback.call(map.editTools);
+                                    }, this);
+
+                            return container;
+                        }
+
+                    });
+
+                    L.NewPolygonControl = L.EditControl.extend({
+                        options: {
+                            position: 'topleft',
+                            callback: self.map.editTools.startPolygon,
+                            kind: 'polygon',
+                            html: '▰'
+                        }
+                    });
+                    var deleteShape = function (e) {
+                        if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) this.editor.deleteShapeAt(e.latlng);
+                    };
+                    self.map.on('layeradd', function (e) {
+                        if (e.layer instanceof L.Path) e.layer.on('click', L.DomEvent.stop).on('click', deleteShape, e.layer);
+                        if (e.layer instanceof L.Path) e.layer.on('dblclick', L.DomEvent.stop).on('dblclick', e.layer.toggleEdit);
+                    });
+
+                    self.map.addControl(new L.NewPolygonControl());
+            },
+            loadArea: function () {
+                var self = this;
+                var id = $("#AreaID").val();
+                $.get("/api/v1/area/"+id, function (area) {
+                    // var geoj = JSON.parse(area.geodata);
+                    // geoj.features.forEach(function(g){
+                    //     var pol = L.polygon(g.geometry.coordinates);
+                    //     pol.addTo(self.map);
+                    //     pol.enableEdit();
+                    //     console.log(pol);
+                    // });  
+                    var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
+                        onEachFeature:function(feature, layer) {
+                            layer.on('dblclick', function(e){
+                                e.target.editing.enable();
+                            });
+                        },
+                    }).addTo(self.map);
+                    gsonLayer.pm.toggleEdit({
+                        draggable: true,
+                        editable:true
+                    });
+                    gsonLayer.on('pm:edit', function(e) {
+                        console.log(e, e.target._layers, this.pm._layers);
+                        for (var key in e.target._layers) {
+                            if (e.target._layers.hasOwnProperty(key)) {
+                                console.log(key + " -> " + JSON.stringify(e.target._layers[key].toGeoJSON()));
+                                $("#geodata").val(JSON.stringify(e.target._layers[key].toGeoJSON()));
+                            }
+                        }
+                    });
+
+                    self.geojson.push(gsonLayer);
+                });
+            },
+            updateLocation: function (name, lat, long) {
+                var self = this;
+                if (!self.markers.hasOwnProperty(name)) {
+                    console.log("ra nemu");
+                    return;
+                }
+                var marker = self.markers[name];
+                console.log(marker._leaflet_id);
+                this.markerGroup.remove(marker._leaflet_id);
+                var newLatLng = new L.LatLng(lat, long);
+                marker.setLatLng([lat, long]).addTo(self.markerGroup);
+            },
+            updateLocation: function () {
+                this.markerGroup.clearLayers();
+                this.loadObject();
+            }
+        };
+        dm.init();
+        dm.loadArea();
+    });
+
+</script>
+
+{{template "footer.html" .}}

@@ -57,14 +57,10 @@ func InitDB() {
 
 	t = Dbm.AddTableWithName(models.MoveHistory{}, "MoveHistory").SetKeys(true, "ObjectID")
 	t.ColMap("Object").Transient = true
-	setColumnSizes(t, map[string]int{
-		"Name":  100,
-		"Group": 100,
-	})
 
 	Dbm.TraceOn("[gorp]", r.INFO)
 	Dbm.CreateTables()
-	//InsertData()
+	// InsertData()
 
 	// Dummy Moving
 	ticker := time.NewTicker(5 * time.Second)

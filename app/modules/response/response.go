@@ -1,4 +1,4 @@
-package json
+package response
 
 // JSONResponse model
 type JSONResponse struct {
