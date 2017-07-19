@@ -73,10 +73,13 @@ func (c Object) ListJson() revel.Result {
 func (c Object) UpdatePosition(name string) revel.Result {
 	var obj models.Object
 	var existingObj models.Object
-	c.Params.BindJSON(&obj)
-	err := c.Txn.SelectOne(&existingObj, `SELECT * FROM "Object" WHERE "Name"=$1`, name)
+	err := c.Params.BindJSON(&obj)
 	if err != nil {
-		response.ERROR(err.Error())
+		return c.RenderJSON(response.ERROR(err.Error()))
+	}
+	err = c.Txn.SelectOne(&existingObj, `SELECT * FROM "Object" WHERE "Name"=$1`, name)
+	if err != nil {
+		return c.RenderJSON(response.ERROR(err.Error()))
 	}
 	checkStopped(&obj, &existingObj)
 	existingObj.Lat = obj.Lat

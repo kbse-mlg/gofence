@@ -170,16 +170,47 @@ func (c Area) GetJson(id int) revel.Result {
 	return c.RenderJSON(Area)
 }
 
-func (c Area) SetHook(id int) revel.Result {
+func (c Area) SetHookWeb(id int) revel.Result {
 	area := c.loadAreaById(id)
+	if area == nil {
+		c.Flash.Error(fmt.Sprintf("Area %d does not exist", id))
+		return c.Redirect(routes.Area.Index())
+	}
+	activestring := c.Params.Form.Get(fmt.Sprintf("active%d", id))
+	b, err := strconv.ParseBool(activestring)
+	if err != nil {
+		c.Flash.Error(err.Error())
+		return c.Redirect(routes.Area.Index())
+	}
+	fmt.Println("-----> active ", b, area.Active)
+	area.Active = b
+	fmt.Println("-----> active updated", b, area.Active)
+	_, err = c.Txn.Update(area)
+	if err != nil {
+		c.Flash.Error(err.Error())
+		fmt.Println("-----> error", err.Error())
+		return c.Redirect(routes.Area.Index())
+	}
+
+	if area.Active == true {
+		geofence.SetFenceHook(area.Name, area.Group, area.Geodata, "")
+	} else {
+		geofence.DeleteHook(area.Name)
+	}
+
+	return c.Redirect(routes.Area.Index())
+}
+
+func (c Area) SetHookAPI(id int) revel.Result {
+	area := c.loadAreaById(id)
+
+	var updatearea models.Area
+	c.Params.BindJSON(&updatearea)
+	area.Active = updatearea.Active
 	if area == nil {
 		return c.RenderJSON(response.ERROR(fmt.Sprintf("Area %d does not exist", id)))
 	}
-	area.Active = !area.Active
-	_, err := c.Txn.Update(area)
-	if err != nil {
-		return c.RenderJSON(response.ERROR(err.Error()))
-	}
+
 	if area.Active == true {
 		geofence.SetFenceHook(area.Name, area.Group, area.Geodata, "")
 	} else {

@@ -46,6 +46,7 @@
                                             <th>Name</th>
                                             <th>Group</th>
                                             <th>Geodata</th>
+                                            <th>Status</th> 
                                             <th>Action</th>
                                             <!-- <th>Delete</th> -->
                                         </tr>
@@ -56,14 +57,57 @@
                                             <td>{{.Name}}</td>
                                             <th>{{.Group}}</th>
                                             <td>{{.Geodata}}</td>
+                                            <th>{{.Active}}</th> 
                                             <td>
                                                 <p>
                                                     <a href="{{url "Area.Edit" .AreaID}}" class="btn btn-primary btn-xs" data-placement="top"><span class="fa fa-fw ti-pencil"></span></a>
+                                                </p>
+                                                <p>
+                                                    <button class="btn btn-primary btn-xs" data-placement="top" data-target="#modal{{.AreaID}}" data-toggle="modal" ><span class="fa fa-fw fa-cog"></span></button>
                                                 </p>
                                                 <!-- <p>
                                                     <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#delete" data-placement="top" onclick="alert('Not implemented yet')"><span class="fa fa-fw ti-trash"></span></button>
                                                 </p> -->
                                             </td>
+                                            <div id="modal{{.AreaID}}" class="modal fade animated" role="dialog" style="display: none;" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal">×</button>
+                                                            <h4 class="modal-title">{{.Name}}</h4>
+                                                        </div>
+                                                        <form role="form" method="POST" action="{{url "Area.SetHookWeb" .AreaID}}" >
+                                                            <div class="modal-body">
+                                                                <div class="row m-t-10">
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <label class="control-label" for="name">Name</label>
+                                                                            <input class="form-control m-t-10" id="name" name="name" disabled value="{{.Name}}"></input>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row m-t-10">
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <label class="control-label" for="active{{.AreaID}}">Status</label>
+                                                                            <select class="form-control m-t-10" name="active{{.AreaID}}" placeholder="Message" rows="6" id="message">
+                                                                                <option value="false" {{if not .Active}} selected {{end}}>Inactive</option>
+                                                                                <option value="true" {{if .Active}} selected {{end}}>Active</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="submit" class="btn btn-succes">Submit</button>
+                                                                <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                                    Close
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </tr>
                                         {{end}}
                                     </tbody>
