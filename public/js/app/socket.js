@@ -4,7 +4,8 @@ var socketManager = function(){
         POSITION = "position",
         SETHOOK = "sethook",
         DELHOOK = "delhook",
-        RESULT = "result";
+        RESULT = "result"
+        STOPPED = "stopped";
 
     return {
         socket:null,
@@ -32,6 +33,7 @@ var socketManager = function(){
                     break;
                     case SETHOOK:;break;
                     case DELHOOK:;break;
+                    case STOPPED:console.log("Stopped ", data);break;
                     case RESULT:
                         if(self.onResult!=null){
                             self.onResult(data);

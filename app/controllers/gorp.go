@@ -54,7 +54,7 @@ func InitDB() {
 		"Group": 100,
 	})
 
-	t = Dbm.AddTableWithName(models.MoveHistory{}, "MoveHistory").SetKeys(true, "ObjectID")
+	t = Dbm.AddTableWithName(models.MoveHistory{}, "MoveHistory").SetKeys(true, "HistoryID")
 	t.ColMap("Object").Transient = true
 
 	Dbm.TraceOn("[gorp]", r.INFO)

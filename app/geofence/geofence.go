@@ -23,6 +23,9 @@ const (
 
 	// RESULT get the result of query
 	RESULT = "result"
+
+	//STOPPED get notification if object stopped
+	STOPPED = "stopped"
 )
 
 // Event is a type for communication
@@ -75,6 +78,10 @@ func DeleteHook(name string) {
 
 func Position(name string, long, lat float64) {
 	publish <- newEvent(POSITION, name, "", long, lat)
+}
+
+func Stopped(name string, long, lat float64) {
+	publish <- newEvent(STOPPED, name, "", long, lat)
 }
 
 func Result(name, data string) {

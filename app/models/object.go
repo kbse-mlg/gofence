@@ -26,6 +26,11 @@ func (u *Object) String() string {
 
 var nameRegex = regexp.MustCompile("^\\w*$")
 
+// SameLoc check same location
+func (obj *Object) SameLoc(newObj *Object) bool {
+	return obj.Long == newObj.Long && obj.Lat == newObj.Lat
+}
+
 func (obj *Object) PostUpdate(exe gorp.SqlExecutor) error {
 	history := MoveHistory{
 		ObjectID: obj.ObjectID,

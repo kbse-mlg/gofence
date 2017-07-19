@@ -24,6 +24,7 @@ var (
 	redispool         *redis.Pool
 	tile38Pool        *redis.Pool
 	redisHookTemplate string = "redis://%s/%s"
+	timestampObject   string = "ts:obj:%s"
 )
 
 func init() {
@@ -137,4 +138,24 @@ func DelAllHook() error {
 	}
 
 	return nil
+}
+
+func SetTsObject(name string) error {
+	c := redispool.Get()
+	defer c.Close()
+	_, err := c.Do("SET", fmt.Sprintf(timestampObject, name), time.Now().UnixNano())
+
+	return err
+}
+
+func GetTsObject(name string) (int64, error) {
+	c := redispool.Get()
+	defer c.Close()
+	ts, err := redis.Int64(c.Do("GET", fmt.Sprintf(timestampObject, name)))
+
+	if err != nil {
+		return 0, err
+	}
+
+	return ts, nil
 }

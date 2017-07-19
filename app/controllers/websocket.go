@@ -90,6 +90,8 @@ func doProcess(txn *gorp.Transaction, cd *ClientData) {
 		geofence.SetFenceHook(cd.Name, cd.Group, cd.Geojson, ":6379")
 	case geofence.DELHOOK:
 		geofence.DeleteHook(cd.Name)
+	case geofence.STOPPED:
+		geofence.Stopped(cd.Name, cd.Lat, cd.Long)
 	default:
 		revel.TRACE.Println("no process")
 	}

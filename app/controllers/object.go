@@ -3,9 +3,11 @@ package controllers
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/kbse-mlg/gofence/app/models"
+	"github.com/kbse-mlg/gofence/app/modules/response"
 	"github.com/revel/revel"
 )
 
@@ -70,11 +72,21 @@ func (c Object) ListJson() revel.Result {
 
 func (c Object) UpdatePosition(name string) revel.Result {
 	var obj models.Object
+	var existingObj models.Object
 	c.Params.BindJSON(&obj)
-	updatePos(c.Txn, name, obj.Lat, obj.Long)
+	err := c.Txn.SelectOne(&existingObj, `SELECT * FROM "Object" WHERE "Name"=$1`, name)
+	if err != nil {
+		response.ERROR(err.Error())
+	}
+	checkStopped(&obj, &existingObj)
+	existingObj.Lat = obj.Lat
+	existingObj.Long = obj.Long
+	existingObj.Group = obj.Group
+
+	c.Txn.Update(&existingObj)
 	geofence.SetObject(name, obj.Group, obj.Lat, obj.Long)
 	geofence.Position(name, obj.Lat, obj.Long)
-	return c.RenderJSON("ok")
+	return c.RenderJSON(response.OK())
 }
 
 func loadObjects(results []interface{}, err error) []*models.Object {
@@ -86,4 +98,18 @@ func loadObjects(results []interface{}, err error) []*models.Object {
 		Objects = append(Objects, r.(*models.Object))
 	}
 	return Objects
+}
+
+func checkStopped(obj1, obj2 *models.Object) {
+	if !obj2.SameLoc(obj1) {
+		geofence.SetTsObject(obj1.Name)
+		return
+	}
+
+	if ts, err := geofence.GetTsObject(obj1.Name); err == nil {
+		now := time.Now().Add(time.Minute * (-10)).UnixNano()
+		if now >= ts {
+			geofence.Stopped(obj1.Name, obj1.Lat, obj1.Long)
+		}
+	}
 }
