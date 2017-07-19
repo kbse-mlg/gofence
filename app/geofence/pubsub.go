@@ -2,6 +2,7 @@ package geofence
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/garyburd/redigo/redis"
 )
@@ -50,20 +51,20 @@ func initPubSub() {
 		c := redispool.Get()
 		defer c.Close()
 
-		// ct := tile38Pool.Get()
-		// defer ct.Close()
+		ct := tile38Pool.Get()
+		defer ct.Close()
 
 		psc := redis.PubSubConn{Conn: c}
 		psc.PSubscribe("fence.*")
 
 		// experiment keep alive redis
-		// go func() {
-		// 	for {
-		// 		c.Do("PING")
-		// 		ct.Do("PING")
-		// 		time.Sleep(20 * time.Second)
-		// 	}
-		// }()
+		go func() {
+			for {
+				c.Do("PING")
+				ct.Do("PING")
+				time.Sleep(20 * time.Second)
+			}
+		}()
 
 		for c.Err() == nil {
 			switch v := psc.Receive().(type) {

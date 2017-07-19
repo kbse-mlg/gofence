@@ -12,7 +12,6 @@ import (
 	db "github.com/revel/modules/db/app"
 	r "github.com/revel/revel"
 
-	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/kbse-mlg/gofence/app/models"
 )
 
@@ -63,68 +62,68 @@ func InitDB() {
 	// InsertData()
 
 	// Dummy Moving
-	ticker := time.NewTicker(5 * time.Second)
-	quit := make(chan struct{})
-	inc := 0.0001
-	direction, counter := 1, 0
+	// ticker := time.NewTicker(150 * time.Second)
+	// quit := make(chan struct{})
+	// inc := 0.0001
+	// direction, counter := 1, 0
 
-	a1 := Coord{Lat: 3.1270, Long: 101.6772}
-	a2 := Coord{Lat: 3.1299, Long: 101.6738}
-	max := 17
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				if counter < max*1 {
-					direction = 1
-				} else if counter < max*2 {
-					direction = 2
-				} else if counter < max*3 {
-					direction = 3
-				} else if counter < max*4 {
-					direction = 4
-				} else {
-					direction = 1
-					counter = 0
-					a1 = Coord{Lat: 3.1270, Long: 101.6772}
-					a2 = Coord{Lat: 3.1299, Long: 101.6738}
-				}
-				counter++
-				// do stuff
-				switch direction {
-				case 1:
-					a1.Long -= inc
-					a2.Long -= inc
-				case 2:
-					a1.Lat -= inc
-					a2.Lat -= inc
-				case 3:
-					a1.Long += inc
-					a2.Long += inc
-				case 4:
-					a1.Long += inc
-					a2.Long += inc
-				}
+	// a1 := Coord{Lat: 3.1270, Long: 101.6772}
+	// a2 := Coord{Lat: 3.1299, Long: 101.6738}
+	// max := 17
+	// go func() {
+	// 	for {
+	// 		select {
+	// 		case <-ticker.C:
+	// 			if counter < max*1 {
+	// 				direction = 1
+	// 			} else if counter < max*2 {
+	// 				direction = 2
+	// 			} else if counter < max*3 {
+	// 				direction = 3
+	// 			} else if counter < max*4 {
+	// 				direction = 4
+	// 			} else {
+	// 				direction = 1
+	// 				counter = 0
+	// 				a1 = Coord{Lat: 3.1270, Long: 101.6772}
+	// 				a2 = Coord{Lat: 3.1299, Long: 101.6738}
+	// 			}
+	// 			counter++
+	// 			// do stuff
+	// 			switch direction {
+	// 			case 1:
+	// 				a1.Long -= inc
+	// 				a2.Long -= inc
+	// 			case 2:
+	// 				a1.Lat -= inc
+	// 				a2.Lat -= inc
+	// 			case 3:
+	// 				a1.Long += inc
+	// 				a2.Long += inc
+	// 			case 4:
+	// 				a1.Long += inc
+	// 				a2.Long += inc
+	// 			}
 
-				txn, err := Dbm.Begin()
-				if err != nil {
-					panic(err)
-				}
-				txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 WHERE "Name"=$3`, a1.Lat, a1.Long, "A1")
-				txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 WHERE "Name"=$3`, a2.Lat, a2.Long, "A2")
-				if err := txn.Commit(); err != nil && err != sql.ErrTxDone {
-					txn.Rollback()
-				}
-				geofence.SetObject("A1", "Truck", a1.Lat, a1.Long)
-				geofence.SetObject("A2", "Truck", a2.Lat, a2.Long)
-				geofence.Position("A1", a1.Lat, a1.Long)
-				geofence.Position("A2", a2.Lat, a2.Long)
-			case <-quit:
-				ticker.Stop()
-				return
-			}
-		}
-	}()
+	// 			txn, err := Dbm.Begin()
+	// 			if err != nil {
+	// 				panic(err)
+	// 			}
+	// 			txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 WHERE "Name"=$3`, a1.Lat, a1.Long, "A1")
+	// 			txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 WHERE "Name"=$3`, a2.Lat, a2.Long, "A2")
+	// 			if err := txn.Commit(); err != nil && err != sql.ErrTxDone {
+	// 				txn.Rollback()
+	// 			}
+	// 			geofence.SetObject("A1", "Truck", a1.Lat, a1.Long)
+	// 			geofence.SetObject("A2", "Truck", a2.Lat, a2.Long)
+	// 			geofence.Position("A1", a1.Lat, a1.Long)
+	// 			geofence.Position("A2", a2.Lat, a2.Long)
+	// 		case <-quit:
+	// 			ticker.Stop()
+	// 			return
+	// 		}
+	// 	}
+	// }()
 }
 
 func InsertData() {

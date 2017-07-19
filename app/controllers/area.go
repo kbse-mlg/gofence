@@ -195,11 +195,12 @@ func (c Area) ConfirmNew() revel.Result {
 	group := c.Params.Form.Get("group")
 	name := c.Params.Form.Get("name")
 
+	fmt.Printf("---> new data geodata:%s\nGroup:%s\nName:%s\n", geodata, group, name)
 	now := time.Now().UnixNano()
 	area := models.Area{0, name, geodata, 1, group, true, now, now}
 
 	// fmt.Println(geodata, group, area)
-	err := c.Txn.Insert(area)
+	err := c.Txn.Insert(&area)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
