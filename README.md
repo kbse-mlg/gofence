@@ -1,8 +1,19 @@
-# Geofencing POC
+# dirty code of geofencing experiment
+ __  _
+ \ `/ |
+  \__`!
+  / ,' `-.__________________
+ '-'\_____                LI`-.
+    <____()-=O=O=O=O=O=[]====--)
+      `.___ ,-----,_______...-'
+           /    .'
+          /   .'
+         /  .'         upix
+         `-'
 
 ### Start the web server:
 
-   revel run myapp
+   revel run dev
 
 ## Code Layout
 
