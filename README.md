@@ -1,4 +1,5 @@
 # dirty code of geofencing experiment
+```
  __  _
  \ `/ |
   \__`!
@@ -10,7 +11,7 @@
           /   .'
          /  .'         upix
          `-'
-
+```
 ### Start the web server:
 
    revel run dev
