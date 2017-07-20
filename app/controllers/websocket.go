@@ -3,8 +3,6 @@ package controllers
 import (
 	"encoding/json"
 
-	"fmt"
-
 	"github.com/go-gorp/gorp"
 	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/revel/revel"
@@ -37,12 +35,12 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 	defer geofence.Leave(name)
 
 	// Send down the archive.
-	for _, event := range subscription.Archive {
-		if websocket.JSON.Send(ws, &event) != nil {
-			// They disconnected
-			return nil
-		}
-	}
+	// for _, event := range subscription.Archive {
+	// 	if websocket.JSON.Send(ws, &event) != nil {
+	// 		// They disconnected
+	// 		return nil
+	// 	}
+	// }
 
 	// In order to select between websocket messages and subscription events, we
 	// need to stuff websocket events into a channel.
@@ -69,7 +67,7 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 			}
 		case msg, ok := <-newMessages:
 			// If the channel is closed, they disconnected.
-			fmt.Println("-->", msg, ok)
+			revel.TRACE.Println("-->", msg, ok)
 			if !ok {
 				return nil
 			}
@@ -81,7 +79,7 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 			}
 			doProcess(c.Txn, &m)
 		case cd, ok := <-newInternalWS:
-			fmt.Println("-->", cd, ok)
+			revel.TRACE.Println("-->", cd, ok)
 			if !ok {
 				return nil
 			}
@@ -108,17 +106,17 @@ func doProcess(txn *gorp.Transaction, cd *ClientData) {
 }
 
 func updatePos(txn *gorp.Transaction, name string, lat, long float64) {
-	fmt.Println(name, lat, long)
+	revel.TRACE.Println(name, lat, long)
 	_, err := txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 WHERE "Name"=$3`, lat, long, name)
 	if err != nil {
-		fmt.Println("--pos-----", err.Error())
+		revel.TRACE.Println("--pos-----", err.Error())
 	}
 }
 
 func updatePosById(txn *gorp.Transaction, id int64, lat, long float64) {
 	_, err := txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 where "ObjectID"=$3`, lat, long, id)
 	if err != nil {
-		fmt.Println("--id-----", err.Error())
+		revel.TRACE.Println("--id-----", err.Error())
 	}
 }
 

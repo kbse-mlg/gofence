@@ -11,3 +11,12 @@ type MoveHistory struct {
 	// Transient
 	Object *Object
 }
+
+// AreaCollection data holder for multiple area collection in pagination view
+type MoveHistoriesCollection struct {
+	MoveHistories []*MoveHistory
+	CurrentSearch string
+	Size          int64
+	Page          int64
+	NextPage      int64
+}

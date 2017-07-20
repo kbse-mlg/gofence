@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/garyburd/redigo/redis"
+	"github.com/revel/revel"
 )
 
 /*
@@ -70,15 +71,15 @@ func initPubSub() {
 		for c.Err() == nil {
 			switch v := psc.Receive().(type) {
 			case redis.PMessage:
-				fmt.Printf("> %s - %s: message: %s\n", v.Pattern, v.Channel, v.Data)
+				revel.TRACE.Printf("> %s - %s: message: %s\n", v.Pattern, v.Channel, v.Data)
 				Result(v.Channel, string(v.Data[:len(v.Data)]))
 			case redis.Subscription:
-				fmt.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
+				revel.TRACE.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
 			case error:
 				return
 			}
 		}
-		fmt.Println(c.Err())
+		revel.TRACE.Println(c.Err())
 		c.Close()
 	}
 }
@@ -87,10 +88,10 @@ func initPubSub() {
 func SetObject(name, group string, lat, long float64) error {
 	c := tile38Pool.Get()
 	defer c.Close()
-	fmt.Printf("SET %s %s POINT %f %f", group, name, lat, long)
+	revel.TRACE.Printf("SET %s %s POINT %f %f", group, name, lat, long)
 	ret, err := c.Do("SET", group, name, "POINT", lat, long)
 	if err != nil {
-		fmt.Printf("%v -- %v", ret, err)
+		revel.TRACE.Printf("%v -- %v", ret, err)
 		return err
 	}
 
@@ -105,10 +106,10 @@ func SetFenceHook(name, group, geojson, redisAddress string) error {
 
 	c := tile38Pool.Get()
 	defer c.Close()
-	fmt.Println("SET HOOK", group, geojson)
+	revel.TRACE.Println("SET HOOK", group, geojson)
 	ret, err := c.Do("SETHOOK", name, fmt.Sprintf(redisHookTemplate, redisAddress, name), "WITHIN", group, "FENCE", "OBJECT", geojson)
 	if err != nil {
-		fmt.Printf("%v -- %v", ret, err)
+		revel.TRACE.Printf("%v -- %v", ret, err)
 		return err
 	}
 
@@ -121,7 +122,7 @@ func DelFenceHook(name string) error {
 	defer c.Close()
 	ret, err := c.Do("DELHOOK", name)
 	if err != nil {
-		fmt.Printf("%d -- %v", ret, err)
+		revel.TRACE.Printf("%d -- %v", ret, err)
 		return err
 	}
 	return nil
@@ -133,7 +134,7 @@ func DelAllHook() error {
 	defer c.Close()
 	ret, err := c.Do("PDELHOOK", "*")
 	if err != nil {
-		fmt.Printf("%d -- %v", ret, err)
+		revel.TRACE.Printf("%d -- %v", ret, err)
 		return err
 	}
 

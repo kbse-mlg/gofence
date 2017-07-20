@@ -83,9 +83,9 @@ func (c Area) List(search string, size, page int) revel.Result {
 
 func (c Area) ListJson() revel.Result {
 
-	size, _ := strconv.ParseInt(c.Params.Route.Get("size"), 0, 64)
+	size, _ := strconv.ParseInt(c.Params.Get("size"), 0, 64)
 	search := c.Params.Route.Get("search")
-	page, _ := strconv.ParseInt(c.Params.Route.Get("page"), 0, 64)
+	page, _ := strconv.ParseInt(c.Params.Get("page"), 0, 64)
 
 	if page == 0 {
 		page = 1

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -112,10 +111,10 @@ func checkStopped(obj1, obj2 *models.Object, name string) {
 
 	if ts, err := geofence.GetTsObject(name); err == nil {
 		now := time.Now().Add(time.Minute * (-10)).UnixNano()
-		fmt.Println("======== >ts vs now ", ts, now)
+		revel.TRACE.Println("========> ts vs now ", ts, now)
 		if now >= ts {
-			fmt.Println("---------> Stoped 10 menit")
-			SendStoppedEvent(obj1.Name, obj1.Lat, obj1.Long)
+			revel.TRACE.Println("---------> Stoped 10 minutes")
+			SendStoppedEvent(name, obj1.Lat, obj1.Long)
 		}
 	} else {
 		geofence.SetTsObject(name)

@@ -36,10 +36,12 @@ func (c App) Index() revel.Result {
 		"https://maps.googleapis.com/maps/api/js?key=AIzaSyBJFNacrQSkWIUsbZjLw4wHo0yyF9DDrgE",
 		"/public/js/app/socket.js",
 		"/public/js/custom_js/pnotify.custom.min.js",
+		"http://underscorejs.org/underscore-min.js",
 	}
 	moreStyles := []string{
 		"https://unpkg.com/leaflet@1.0.3/dist/leaflet.css",
 		"/public/css/custom_css/pnotify.custom.min.css",
+		"/public/css/timeline.css",
 	}
 	IsDashboard := true
 

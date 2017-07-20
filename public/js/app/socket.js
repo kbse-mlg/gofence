@@ -33,7 +33,11 @@ var socketManager = function(){
                     break;
                     case SETHOOK:;break;
                     case DELHOOK:;break;
-                    case STOPPED:console.log("Stopped ", data);break;
+                    case STOPPED:
+                     if(self.onStopped!=null){
+                            self.onStopped(data);
+                        }
+                        console.log("Stopped ", data);break;
                     case RESULT:
                         if(self.onResult!=null){
                             self.onResult(data);

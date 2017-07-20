@@ -31,6 +31,7 @@ GET     /public/*filepath                       Static.Serve("public")
 # API
 
 GET     /api/v1/area                            Area.ListJson
+GET     /api/v1/log                             LocationHistory.ListJson
 GET     /api/v1/area/:id                        Area.GetJson
 POST    /api/v1/area/:id/hook                   Area.SetHookAPI
 GET     /api/v1/object                          Object.ListJson

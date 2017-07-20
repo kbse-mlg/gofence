@@ -32,7 +32,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12">
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
                 <div class="panel ">
                     <div class="panel-heading">
                         <h3 class="panel-title">
@@ -43,7 +45,7 @@
                             </span>
                     </div>
                     <div class="panel-body">
-                        <div class="table-responsive">
+                        <div class="table-responsive" style="height: 400px; overflow:scroll;">
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -69,7 +71,28 @@
                     </div>
                 </div>
             </div>
-            <!-- row -->
+            <div class="col-md-4">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <i class="fa fa-fw ti-comment-alt"></i> Recent Activities
+                        </h3>
+                        <span class="pull-right">
+                                        <i class="fa fa-fw ti-angle-up clickable"></i>
+                                        <i class="fa fa-fw ti-close removepanel clickable"></i>
+                                    </span>
+                    </div>
+                    <div class="panel-body">
+                        <ul id="latest_history" class="update-history schedule-cont" style="height: 390px; overflow: scroll; padding:5px;">
+                            <li>
+                                No Activities
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- row -->
     </section>
 </aside>
 <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
@@ -156,7 +179,7 @@
         };
         dm.init();
 
-        sm.socketConnected(function(){
+        sm.socketConnected(function () {
             dm.loadArea();
             dm.loadObject();
         });
@@ -186,24 +209,23 @@
             console.log(result);
             if (result.data) {
                 var data = JSON.parse(result.data);
-                if(data.id==code){
+                if (data.id == code) {
                     clearTimeout(timer);
                 }
-                
+
                 timer = setTimeout(function () {
-                    
-                        console.log(data);
-                        switch(data.detect){
-                            case "enter":notify("Enter", data.key +" "+data.id+" enter geofence area", "success");break;
-                            case "exit":notify("Exit", data.key +" "+data.id+" exit geofence area", "info");break;
-                            case "outside":notify("Outside", data.key +" "+data.id+" outside geofence area", "warning");break;
-                            case "inside":notify("Inside", data.key +" "+data.id+" inside geofence area", "warning");break;
-                        }
+                    console.log(data);
+                    switch (data.detect) {
+                        case "enter": notify("Enter", data.key + " " + data.id + " enter geofence area", "success"); break;
+                        case "exit": notify("Exit", data.key + " " + data.id + " exit geofence area", "info"); break;
+                        // case "outside":notify("Outside", data.key +" "+data.id+" outside geofence area", "warning");break;
+                        // case "inside":notify("Inside", data.key +" "+data.id+" inside geofence area", "warning");break;
+                    }
                 }, 900);
             }
         };
 
-        function notify(title, text, type){
+        function notify(title, text, type) {
             new PNotify({
                 title: title,
                 text: text,
@@ -216,6 +238,54 @@
             var target = $(e.target);
             dm.setCenter(target.attr("lat"), target.attr("long"), target.attr("name"));
         });
+
+        // newsticker 
+        var tpl = _.template('<li class="item success"><div class="data">'+
+                             '<div class="time text-muted"><%=time%></div>'+
+                            '<p><span class="text-info"><%=code%></span> <%=text%> </p></div></li>');
+       
+        //get last n data history
+        function fetchDataHistory(page){
+            $.get("/api/v1/log?page="+page).done(function(data){
+                if(!data.MoveHistories){
+                    return;
+                }
+                page = data.NextPage;
+                console.log(data);
+                data.MoveHistories.forEach(function(item){
+                    console.log(item);
+                    $("#latest_history").append(
+                    tpl({
+                        time:item.created,
+                        code:item.id,
+                        text:"long: "+item.long+" lat:"+item.lat
+                    }));
+                })
+            })
+        }
+        var hasData=true;
+        var page=1;
+        setInterval(function() {
+            if(page==1){
+                $("#latest_history").empty();
+            }
+            $.get("/api/v1/log?page="+page).done(function(data){
+                if(!data.MoveHistories){
+                    return;
+                }
+                page = data.NextPage;
+                console.log(data);
+                data.MoveHistories.forEach(function(item){
+                    console.log(item);
+                    $("#latest_history").append(
+                    tpl({
+                        time:item.created,
+                        code:item.id,
+                        text:"long: "+item.long+" lat:"+item.lat
+                    }));
+                })
+            })
+        }, 5000);
     });
 
 </script>
