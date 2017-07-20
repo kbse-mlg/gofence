@@ -24,6 +24,10 @@ type ClientData struct {
 	Lat     float64 `json:"lat"`
 }
 
+var (
+	newInternalWS = make(chan ClientData)
+)
+
 func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 	// Join the room.
 	subscription := geofence.Subscribe()
@@ -76,6 +80,12 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 				// put error message
 			}
 			doProcess(c.Txn, &m)
+		case cd, ok := <-newInternalWS:
+			fmt.Println("-->", cd, ok)
+			if !ok {
+				return nil
+			}
+			doProcess(c.Txn, &cd)
 		}
 	}
 }
@@ -110,4 +120,12 @@ func updatePosById(txn *gorp.Transaction, id int64, lat, long float64) {
 	if err != nil {
 		fmt.Println("--id-----", err.Error())
 	}
+}
+
+func newClientData(cmd, name, data, group string, long, lat float64) ClientData {
+	return ClientData{cmd, name, data, group, long, lat}
+}
+
+func SendStoppedEvent(name string, long, lat float64) {
+	newInternalWS <- newClientData(geofence.STOPPED, name, "", "", long, lat)
 }

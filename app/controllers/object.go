@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -81,7 +82,7 @@ func (c Object) UpdatePosition(name string) revel.Result {
 	if err != nil {
 		return c.RenderJSON(response.ERROR(err.Error()))
 	}
-	checkStopped(&obj, &existingObj)
+	checkStopped(&obj, &existingObj, existingObj.Name)
 	existingObj.Lat = obj.Lat
 	existingObj.Long = obj.Long
 	existingObj.Group = obj.Group
@@ -103,16 +104,20 @@ func loadObjects(results []interface{}, err error) []*models.Object {
 	return Objects
 }
 
-func checkStopped(obj1, obj2 *models.Object) {
+func checkStopped(obj1, obj2 *models.Object, name string) {
 	if !obj2.SameLoc(obj1) {
-		geofence.SetTsObject(obj1.Name)
+		geofence.SetTsObject(name)
 		return
 	}
 
-	if ts, err := geofence.GetTsObject(obj1.Name); err == nil {
+	if ts, err := geofence.GetTsObject(name); err == nil {
 		now := time.Now().Add(time.Minute * (-10)).UnixNano()
+		fmt.Println("======== >ts vs now ", ts, now)
 		if now >= ts {
-			geofence.Stopped(obj1.Name, obj1.Lat, obj1.Long)
+			fmt.Println("---------> Stoped 10 menit")
+			SendStoppedEvent(obj1.Name, obj1.Lat, obj1.Long)
 		}
+	} else {
+		geofence.SetTsObject(name)
 	}
 }
