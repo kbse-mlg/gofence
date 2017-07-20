@@ -26,16 +26,17 @@ func (c LocationHistory) ListJson() revel.Result {
 	if size == 0 {
 		size = 10
 	}
+
 	search = strings.TrimSpace(search)
 	revel.TRACE.Printf("size:%d page:%d\n", size, page)
 
 	var movehistories []*models.MoveHistory
 	if search == "" {
-		movehistories = loadLocationHistory(c.Txn.Select(models.MoveHistory{},
+		movehistories = c.loadLocationHistory(c.Txn.Select(models.MoveHistory{},
 			`select * from "MoveHistory" OFFSET $1 LIMIT $2`, (page-1)*size, size))
 	} else {
 		search = strings.ToLower(search)
-		movehistories = loadLocationHistory(c.Txn.Select(models.MoveHistory{},
+		movehistories = c.loadLocationHistory(c.Txn.Select(models.MoveHistory{},
 			`select * from "MoveHistory" where lower(Name) like $1
  OFFSET $2 LIMIT $3`, "%"+search+"%", (page-1)*size, size))
 	}
@@ -51,14 +52,22 @@ func (c LocationHistory) ListJson() revel.Result {
 	return c.RenderJSON(result)
 }
 
-func loadLocationHistory(results []interface{}, err error) []*models.MoveHistory {
+func (c LocationHistory) loadLocationHistory(results []interface{}, err error) []*models.MoveHistory {
 	if err != nil {
 		revel.TRACE.Fatal(err.Error())
 		return nil
 	}
+	tz, err := strconv.Atoi(c.Session["tz"])
+	if err != nil {
+		tz = -420
+	}
+
 	var Histories []*models.MoveHistory
 	for _, r := range results {
-		Histories = append(Histories, r.(*models.MoveHistory))
+		hist := r.(*models.MoveHistory)
+		hist.Created.TimezoneOffset = tz
+		hist.Created.Relative = true
+		Histories = append(Histories, hist)
 	}
 	return Histories
 }

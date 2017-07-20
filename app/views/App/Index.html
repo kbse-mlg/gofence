@@ -121,7 +121,10 @@
                     center: this.center,
                     zoom: this.zoom
                 });
-
+                // HACK: solution, it must be after login then set tz value.
+                var d = new Date()
+                var n = d.getTimezoneOffset();
+                $.get("/api/v1/tz?tz="+n);
                 L.tileLayer(this.urlTileLayer, {
                     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
                     maxZoom: 18,

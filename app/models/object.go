@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-gorp/gorp"
+	"github.com/kbse-mlg/gofence/utility/types"
 	"github.com/revel/revel"
 )
 
@@ -36,7 +37,7 @@ func (obj *Object) PostUpdate(exe gorp.SqlExecutor) error {
 		ObjectID: obj.ObjectID,
 		Long:     obj.Long,
 		Lat:      obj.Lat,
-		Created:  time.Now().UnixNano(),
+		Created:  types.DateTimezone{Int64: time.Now().UnixNano()},
 	}
 	return exe.Insert(&history)
 }

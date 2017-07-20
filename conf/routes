@@ -36,3 +36,4 @@ GET     /api/v1/area/:id                        Area.GetJson
 POST    /api/v1/area/:id/hook                   Area.SetHookAPI
 GET     /api/v1/object                          Object.ListJson
 POST    /api/v1/location/:name                  Object.UpdatePosition
+GET     /api/v1/tz                              App.SetTimezone

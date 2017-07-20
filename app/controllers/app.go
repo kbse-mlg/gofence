@@ -1,7 +1,10 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/kbse-mlg/gofence/app/models"
+	"github.com/kbse-mlg/gofence/app/modules/response"
 	"github.com/kbse-mlg/gofence/app/routes"
 	"github.com/revel/revel"
 )
@@ -66,4 +69,11 @@ func (c App) checkUser() revel.Result {
 		return c.Redirect(routes.App.Index())
 	}
 	return nil
+}
+
+func (c App) SetTimezone() revel.Result {
+	tz := c.Params.Get("tz")
+	cookie := &http.Cookie{Name: "tz", Value: tz}
+	c.SetCookie(cookie)
+	return c.RenderJSON(response.OK())
 }
