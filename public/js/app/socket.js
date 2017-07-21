@@ -30,7 +30,7 @@ var socketManager = function(){
                         if(self.onPosition!=null){
                             self.onPosition(data);
                         }
-                    break;
+                        console.log("Position ", data);break;
                     case SETHOOK:;break;
                     case DELHOOK:;break;
                     case STOPPED:
@@ -86,6 +86,7 @@ var socketManager = function(){
         },
         onPosition:null,
         onResult:null,
+        onStopped:null,
     }
 }
 window.socketManager = socketManager;

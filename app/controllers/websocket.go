@@ -35,12 +35,12 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 	defer geofence.Leave(name)
 
 	// Send down the archive.
-	// for _, event := range subscription.Archive {
-	// 	if websocket.JSON.Send(ws, &event) != nil {
-	// 		// They disconnected
-	// 		return nil
-	// 	}
-	// }
+	for _, event := range subscription.Archive {
+		if websocket.JSON.Send(ws, &event) != nil {
+			// They disconnected
+			return nil
+		}
+	}
 
 	// In order to select between websocket messages and subscription events, we
 	// need to stuff websocket events into a channel.
@@ -78,12 +78,12 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 				// put error message
 			}
 			doProcess(c.Txn, &m)
-		case cd, ok := <-newInternalWS:
-			revel.TRACE.Println("-->", cd, ok)
-			if !ok {
-				return nil
-			}
-			doProcess(c.Txn, &cd)
+			// case cd, ok := <-newInternalWS:
+			// 	revel.TRACE.Println("-->", cd, ok)
+			// 	if !ok {
+			// 		return nil
+			// 	}
+			// 	doProcess(c.Txn, &cd)
 		}
 	}
 }

@@ -196,6 +196,10 @@
             dm.updateLocation();
         };
 
+         sm.onStopped = function (data) {
+            console.log(data);
+        };
+
         function debounce(fn, delay) {
             var timer = null;
             return function () {
@@ -221,8 +225,8 @@
                     switch (data.detect) {
                         case "enter": notify("Enter", data.key + " " + data.id + " enter geofence area", "success"); break;
                         case "exit": notify("Exit", data.key + " " + data.id + " exit geofence area", "info"); break;
-                        // case "outside":notify("Outside", data.key +" "+data.id+" outside geofence area", "warning");break;
-                        // case "inside":notify("Inside", data.key +" "+data.id+" inside geofence area", "warning");break;
+                        case "outside":notify("Outside", data.key +" "+data.id+" outside geofence area", "warning");break;
+                        case "inside":notify("Inside", data.key +" "+data.id+" inside geofence area", "warning");break;
                     }
                 }, 900);
             }

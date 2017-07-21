@@ -171,7 +171,7 @@ func (c Object) loadLocationHistory(results []interface{}, err error) []*models.
 		hist := r.(*models.MoveHistory)
 		hist.Created.TimezoneOffset = tz
 		hist.Created.Relative = false
-		hist.StringCreated = hist.Created.String()
+		hist.StringCreated = hist.Created.ToStr()
 		Histories = append(Histories, hist)
 	}
 	return Histories

@@ -39,7 +39,7 @@ func newPool(address string) *redis.Pool {
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial("tcp", address)
 			if err != nil {
-				panic(err.Error())
+				revel.TRACE.Fatal(err.Error())
 			}
 			return c, err
 		},

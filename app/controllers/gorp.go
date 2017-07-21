@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -12,17 +13,84 @@ import (
 	db "github.com/revel/modules/db/app"
 	r "github.com/revel/revel"
 
+	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/kbse-mlg/gofence/app/models"
-)
-
-var (
-	Dbm *gorp.DbMap
 )
 
 type Coord struct {
 	Lat  float64 `json:"lat"`
 	Long float64 `json:"long"`
 }
+
+var (
+	Dbm   *gorp.DbMap
+	Route []Coord = []Coord{
+		{3.127437461, 101.676402334},
+		{3.127849069, 101.676072003},
+		{3.128427563, 101.675369265},
+		{3.128834651, 101.674891831},
+		{3.129235546, 101.674454212},
+		{3.129632757, 101.674628975},
+		{3.130141617, 101.674097897},
+		{3.129954142, 101.673861863},
+		{3.130334448, 101.673588278},
+		{3.130120191, 101.673185946},
+		{3.129980924, 101.672912361},
+		{3.129713104, 101.673116209},
+		{3.129488134, 101.673320057},
+		{3.129263165, 101.673534634},
+		{3.129032839, 101.673738481},
+		{3.128834651, 101.673953058},
+		{3.128598968, 101.674189093},
+		{3.128373999, 101.674430491},
+		{3.128202593, 101.674618246},
+		{3.128047257, 101.674822094},
+		{3.127849069, 101.675036671},
+		{3.127715158, 101.675224425},
+		{3.127575891, 101.675358536},
+		{3.127425074, 101.675886512},
+		{3.127120595, 101.675557019},
+		{3.126638516, 101.675337078},
+		{3.126177863, 101.675197603},
+		{3.125743991, 101.674848916},
+		{3.125347615, 101.674527051},
+		{3.125010159, 101.674194457},
+		{3.124811971, 101.673947694},
+		{3.124624495, 101.674130084},
+		{3.124485228, 101.674339296},
+		{3.124303109, 101.67453778},
+		{3.12402993, 101.674865009},
+		{3.123853167, 101.675090315},
+		{3.123665692, 101.675320985},
+		{3.123537137, 101.675535562},
+		{3.123392513, 101.675707223},
+		{3.123183611, 101.675927164},
+		{3.123017561, 101.676163198},
+		{3.123296097, 101.676447513},
+		{3.123590701, 101.676731827},
+		{3.123896019, 101.676914217},
+		{3.124169197, 101.677150251},
+		{3.124404881, 101.677289726},
+		{3.124892317, 101.677584769},
+		{3.125245842, 101.677751066},
+		{3.125658288, 101.677944185},
+		{3.126161793, 101.678185584},
+		{3.126681367, 101.67841089},
+		{3.127104525, 101.678609373},
+		{3.127431268, 101.678904416},
+		{3.127940128, 101.679274561},
+		{3.128320434, 101.679574968},
+		{3.128593612, 101.67918873},
+		{3.128781087, 101.678974153},
+		{3.128513266, 101.678738119},
+		{3.128202593, 101.678475263},
+		{3.127806218, 101.678013923},
+		{3.127527683, 101.677713515},
+		{3.127297357, 101.677246811},
+		{3.127275931, 101.6767962},
+		{3.127415198, 101.67642069},
+	}
+)
 
 func InitDB() {
 	db.Init()
@@ -68,68 +136,69 @@ func InitDB() {
 	// InsertData()
 
 	// Dummy Moving
-	// ticker := time.NewTicker(150 * time.Second)
-	// quit := make(chan struct{})
-	// inc := 0.0001
-	// direction, counter := 1, 0
+	ticker := time.NewTicker(5 * time.Second)
+	quit := make(chan struct{})
+	counter := 0
 
-	// a1 := Coord{Lat: 3.1270, Long: 101.6772}
-	// a2 := Coord{Lat: 3.1299, Long: 101.6738}
-	// max := 17
-	// go func() {
-	// 	for {
-	// 		select {
-	// 		case <-ticker.C:
-	// 			if counter < max*1 {
-	// 				direction = 1
-	// 			} else if counter < max*2 {
-	// 				direction = 2
-	// 			} else if counter < max*3 {
-	// 				direction = 3
-	// 			} else if counter < max*4 {
-	// 				direction = 4
-	// 			} else {
-	// 				direction = 1
-	// 				counter = 0
-	// 				a1 = Coord{Lat: 3.1270, Long: 101.6772}
-	// 				a2 = Coord{Lat: 3.1299, Long: 101.6738}
-	// 			}
-	// 			counter++
-	// 			// do stuff
-	// 			switch direction {
-	// 			case 1:
-	// 				a1.Long -= inc
-	// 				a2.Long -= inc
-	// 			case 2:
-	// 				a1.Lat -= inc
-	// 				a2.Lat -= inc
-	// 			case 3:
-	// 				a1.Long += inc
-	// 				a2.Long += inc
-	// 			case 4:
-	// 				a1.Long += inc
-	// 				a2.Long += inc
-	// 			}
+	var a1, a2 *models.Object
+	max := len(Route)
+	fmt.Println("--->", max, a1, a2)
 
-	// 			txn, err := Dbm.Begin()
-	// 			if err != nil {
-	// 				panic(err)
-	// 			}
-	// 			txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 WHERE "Name"=$3`, a1.Lat, a1.Long, "A1")
-	// 			txn.Exec(`UPDATE "Object" SET "Lat"=$1, "Long"=$2 WHERE "Name"=$3`, a2.Lat, a2.Long, "A2")
-	// 			if err := txn.Commit(); err != nil && err != sql.ErrTxDone {
-	// 				txn.Rollback()
-	// 			}
-	// 			geofence.SetObject("A1", "Truck", a1.Lat, a1.Long)
-	// 			geofence.SetObject("A2", "Truck", a2.Lat, a2.Long)
-	// 			geofence.Position("A1", a1.Lat, a1.Long)
-	// 			geofence.Position("A2", a2.Lat, a2.Long)
-	// 		case <-quit:
-	// 			ticker.Stop()
-	// 			return
-	// 		}
-	// 	}
-	// }()
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				if counter == max {
+					counter = 0
+				}
+
+				c1 := Route[counter]
+				c2 := Route[max-counter-1]
+				counter++
+				fmt.Println("--->", counter, c1, c2)
+
+				txn, err := Dbm.Begin()
+				if err != nil {
+					fmt.Println("----error", err.Error())
+					panic(err)
+				}
+				// get data from db
+				if a1 == nil {
+					af1, err := txn.Get(models.Object{}, 1)
+					if err == nil {
+						a1 = af1.(*models.Object)
+					}
+				}
+
+				if a2 == nil {
+					af2, err := txn.Get(models.Object{}, 2)
+					if err == nil {
+						a2 = af2.(*models.Object)
+					}
+				}
+
+				a1.Lat = c1.Lat
+				a1.Long = c1.Long
+				a2.Lat = c2.Lat
+				a2.Long = c2.Long
+
+				txn.Update(a1)
+				txn.Update(a2)
+				if err := txn.Commit(); err != nil && err != sql.ErrTxDone {
+					fmt.Println("----error", err.Error())
+					txn.Rollback()
+				}
+				geofence.SetObject("A1", "Truck", c1.Lat, c1.Long)
+				geofence.SetObject("A2", "Truck", c2.Lat, c2.Long)
+				geofence.Position("A1", c1.Lat, c1.Long)
+				geofence.Position("A2", c2.Lat, c2.Long)
+			case <-quit:
+				fmt.Println("----stopped")
+				ticker.Stop()
+				// return
+			}
+		}
+	}()
 }
 
 func InsertData() {

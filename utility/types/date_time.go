@@ -17,7 +17,7 @@ type DateTime struct {
 	CommonFormat   string
 }
 
-func (n *DateTime) String() string {
+func (n *DateTime) ToStr() string {
 	if n.Int64 == 0 {
 		return ""
 	}
