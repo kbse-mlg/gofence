@@ -266,29 +266,29 @@
                 })
             })
         }
-        var hasData=true;
-        var page=1;
-        setInterval(function() {
-            if(page==1){
-                $("#latest_history").empty();
-            }
-            $.get("/api/v1/log?page="+page).done(function(data){
-                if(!data.MoveHistories){
-                    return;
-                }
-                page = data.NextPage;
-                console.log(data);
-                data.MoveHistories.forEach(function(item){
-                    console.log(item);
-                    $("#latest_history").append(
-                    tpl({
-                        time:item.created,
-                        code:item.id,
-                        text:"long: "+item.long+" lat:"+item.lat
-                    }));
-                })
-            })
-        }, 5000);
+        // var hasData=true;
+        // var page=1;
+        // setInterval(function() {
+        //     if(page==1){
+        //         $("#latest_history").empty();
+        //     }
+        //     $.get("/api/v1/log?page="+page).done(function(data){
+        //         if(!data.MoveHistories){
+        //             return;
+        //         }
+        //         page = data.NextPage;
+        //         console.log(data);
+        //         data.MoveHistories.forEach(function(item){
+        //             console.log(item);
+        //             $("#latest_history").append(
+        //             tpl({
+        //                 time:item.created,
+        //                 code:item.id,
+        //                 text:"long: "+item.long+" lat:"+item.lat
+        //             }));
+        //         })
+        //     })
+        // }, 5000);
     });
 
 </script>

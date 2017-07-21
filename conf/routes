@@ -14,6 +14,7 @@ POST    /areas/hook                              Area.SetHookWeb
 GET     /areas/:id                               Area.Edit
 POST    /areas/:id                               Area.ConfirmEdit
 GET     /objects                                 Object.Index
+GET     /objects/:id/history                     Object.History
 
 # WebSocket demo
 WS      /websocket/geofence                     WebSocket.Geofence

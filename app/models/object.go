@@ -37,7 +37,7 @@ func (obj *Object) PostUpdate(exe gorp.SqlExecutor) error {
 		ObjectID: obj.ObjectID,
 		Long:     obj.Long,
 		Lat:      obj.Lat,
-		Created:  types.DateTimezone{Int64: time.Now().UnixNano()},
+		Created:  types.DateTime{Int64: time.Now().UnixNano()},
 	}
 	return exe.Insert(&history)
 }

@@ -6,11 +6,12 @@ import (
 
 // MoveHistory Move history
 type MoveHistory struct {
-	HistoryID int                `json:"id"`
-	ObjectID  int                `json:"object_id"`
-	Long      float64            `json:"long"`
-	Lat       float64            `json:"lat"`
-	Created   types.DateTimezone `json:"created"`
+	HistoryID     int            `json:"id"`
+	ObjectID      int            `json:"object_id"`
+	Long          float64        `json:"long"`
+	Lat           float64        `json:"lat"`
+	Created       types.DateTime `json:"created"`
+	StringCreated string         `json:"-" db:"-"`
 
 	// Transient
 	Object *Object

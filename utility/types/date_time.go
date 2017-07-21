@@ -9,7 +9,7 @@ import (
 
 const defaultTimeFormat = "Mon, 01/_2/2006 15:04:05 PM"
 
-type DateTimezone struct {
+type DateTime struct {
 	Int64          int64
 	Valid          bool
 	TimezoneOffset int
@@ -17,7 +17,21 @@ type DateTimezone struct {
 	CommonFormat   string
 }
 
-func (n *DateTimezone) Scan(value interface{}) error {
+func (n *DateTime) String() string {
+	if n.Int64 == 0 {
+		return ""
+	}
+	nsec := int64(n.TimezoneOffset * 6E10)
+	t := time.Unix(0, n.Int64-nsec).In(time.FixedZone("", -n.TimezoneOffset))
+	if n.Relative {
+		x := n.formatRelative(t)
+		return strconv.Quote(x)
+	}
+	s := strconv.Quote(t.Format(n.dateTimeFormat()))
+	return s
+}
+
+func (n *DateTime) Scan(value interface{}) error {
 	if value == nil {
 		n.Int64, n.Valid = int64(0), false
 		return nil
@@ -27,7 +41,7 @@ func (n *DateTimezone) Scan(value interface{}) error {
 	return nil
 }
 
-func (n DateTimezone) Value() (driver.Value, error) {
+func (n DateTime) Value() (driver.Value, error) {
 	if !n.Valid {
 		return nil, nil
 	}
@@ -36,7 +50,7 @@ func (n DateTimezone) Value() (driver.Value, error) {
 
 // TODO: format in relative time representation
 // e.g. 2 days ago
-func (n DateTimezone) formatRelative(t time.Time) string {
+func (n DateTime) formatRelative(t time.Time) string {
 	nsec := int64(n.TimezoneOffset * 6E10)
 	now := time.Unix(0, time.Now().UTC().UnixNano()-nsec).In(time.FixedZone("", -n.TimezoneOffset))
 	d := now.Sub(t)
@@ -74,7 +88,7 @@ func (n DateTimezone) formatRelative(t time.Time) string {
 	return fmt.Sprintf("%d years ago", int64(years))
 }
 
-func (n DateTimezone) dateTimeFormat() string {
+func (n DateTime) dateTimeFormat() string {
 	if n.CommonFormat != "" {
 		return FromCommonDateTimeFormat(n.CommonFormat)
 	}
@@ -83,7 +97,7 @@ func (n DateTimezone) dateTimeFormat() string {
 
 // MarshalJSON converts the int64 into string representation
 // TODO: need many enhancements
-func (n DateTimezone) MarshalJSON() ([]byte, error) {
+func (n DateTime) MarshalJSON() ([]byte, error) {
 	if n.Int64 == 0 {
 		return []byte(strconv.Quote("")), nil
 	}
@@ -98,7 +112,7 @@ func (n DateTimezone) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON parse the string representation into in64 value
-func (n *DateTimezone) UnmarshalJSON(b []byte) error {
+func (n *DateTime) UnmarshalJSON(b []byte) error {
 	s, err := strconv.Unquote(string(b))
 	if err != nil {
 		return err

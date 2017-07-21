@@ -47,6 +47,7 @@ func InitDB() {
 		"Type":    6,
 		"Group":   100,
 	})
+	t.AddIndex("NameIndex", "Btree", []string{"Name"}).SetUnique(true)
 
 	t = Dbm.AddTableWithName(models.Object{}, "Object").SetKeys(true, "ObjectID")
 	setColumnSizes(t, map[string]int{
@@ -57,8 +58,13 @@ func InitDB() {
 	t = Dbm.AddTableWithName(models.MoveHistory{}, "MoveHistory").SetKeys(true, "HistoryID")
 	t.ColMap("Object").Transient = true
 
+	t = Dbm.AddTableWithName(models.Alert{}, "Alert").SetKeys(true, "ID")
+	setColumnSizes(t, map[string]int{
+		"Info": 100,
+	})
+
 	Dbm.TraceOn("[gorp]", r.INFO)
-	Dbm.CreateTables()
+	Dbm.CreateTablesIfNotExists()
 	// InsertData()
 
 	// Dummy Moving

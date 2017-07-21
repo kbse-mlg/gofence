@@ -8,6 +8,7 @@ import (
 	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/kbse-mlg/gofence/app/models"
 	"github.com/kbse-mlg/gofence/app/modules/response"
+	"github.com/kbse-mlg/gofence/app/routes"
 	"github.com/revel/revel"
 )
 
@@ -119,4 +120,59 @@ func checkStopped(obj1, obj2 *models.Object, name string) {
 	} else {
 		geofence.SetTsObject(name)
 	}
+}
+
+func (c Object) History(id, search string, size, page int) revel.Result {
+	object, err := c.Txn.Get(models.Object{}, id)
+	if err != nil {
+		return c.Redirect(routes.Object.Index())
+	}
+	if page == 0 {
+		page = 1
+	}
+	if size == 0 {
+		size = 10
+	}
+	nextPage := page + 1
+	prevPage := page
+	search = strings.TrimSpace(search)
+
+	var movehistories []*models.MoveHistory
+	if search == "" {
+		movehistories = c.loadLocationHistory(c.Txn.Select(models.MoveHistory{},
+			`select * from "MoveHistory" WHERE "ObjectID"=$1 OFFSET $2 LIMIT $3`, id, (page-1)*size, size))
+	} else {
+		search = strings.ToLower(search)
+		movehistories = c.loadLocationHistory(c.Txn.Select(models.MoveHistory{},
+			`select * from "MoveHistory" where lower(Name) like $1 AND "ObjectID"=$2
+ OFFSET $3 LIMIT $4`, "%"+search+"%", id, (page-1)*size, size))
+	}
+
+	if movehistories == nil || len(movehistories) < size {
+		nextPage = -1
+		prevPage = page - 1
+	}
+
+	return c.Render(object, movehistories, search, size, page, nextPage, prevPage)
+}
+
+func (c Object) loadLocationHistory(results []interface{}, err error) []*models.MoveHistory {
+	if err != nil {
+		revel.TRACE.Fatal(err.Error())
+		return nil
+	}
+	tz, err := strconv.Atoi(c.Session["tz"])
+	if err != nil {
+		tz = -420
+	}
+
+	var Histories []*models.MoveHistory
+	for _, r := range results {
+		hist := r.(*models.MoveHistory)
+		hist.Created.TimezoneOffset = tz
+		hist.Created.Relative = false
+		hist.StringCreated = hist.Created.String()
+		Histories = append(Histories, hist)
+	}
+	return Histories
 }
