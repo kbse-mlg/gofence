@@ -102,15 +102,20 @@ func SetObject(name, group string, lat, long float64) error {
 }
 
 // SetFenceHook set webhook to redis
-func SetFenceHook(name, group, geojson, redisAddress string) error {
+func SetFenceHook(prefix, name, group, geojson, redisAddress string) error {
 	if redisAddress == "" {
-		redisAddress = ":9851"
+		redisAddress = ":6379"
 	}
 
+	if prefix == "" {
+		prefix = "fence"
+	}
+	pname := fmt.Sprintf("%s.%s", prefix, name)
+	//tile38 command
 	c, _ := redis.Dial("tcp", ":9851")
 	defer c.Close()
 	revel.TRACE.Println("SET HOOK", group, geojson)
-	ret, err := c.Do("SETHOOK", name, fmt.Sprintf(redisHookTemplate, redisAddress, name), "WITHIN", group, "FENCE", "OBJECT", geojson)
+	ret, err := c.Do("SETHOOK", pname, fmt.Sprintf(redisHookTemplate, redisAddress, pname), "WITHIN", group, "FENCE", "OBJECT", geojson)
 	if err != nil {
 		revel.TRACE.Printf("%v -- %v", ret, err)
 		return err

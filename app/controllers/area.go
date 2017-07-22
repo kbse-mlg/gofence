@@ -193,7 +193,7 @@ func (c Area) SetHookWeb(id int) revel.Result {
 	}
 
 	if area.Active == true {
-		geofence.SetFenceHook(area.Name, area.Group, area.Geodata, "")
+		geofence.SetFenceHook("", area.Name, area.Group, area.Geodata, "")
 	} else {
 		geofence.DeleteHook(area.Name)
 	}
@@ -212,7 +212,7 @@ func (c Area) SetHookAPI(id int) revel.Result {
 	}
 
 	if area.Active == true {
-		geofence.SetFenceHook(area.Name, area.Group, area.Geodata, "")
+		geofence.SetFenceHook("", area.Name, area.Group, area.Geodata, "")
 	} else {
 		geofence.DeleteHook(area.Name)
 	}
@@ -236,7 +236,7 @@ func (c Area) ConfirmNew() revel.Result {
 		fmt.Println(err.Error())
 	}
 
-	geofence.SetFenceHook(area.Name, area.Group, area.Geodata, ":9851")
+	geofence.SetFenceHook("fence", area.Name, area.Group, area.Geodata, ":6379")
 
 	return c.Redirect(routes.Area.Index())
 }
@@ -260,7 +260,7 @@ func (c Area) ConfirmEdit(id int) revel.Result {
 		fmt.Println(err.Error())
 	}
 
-	geofence.SetFenceHook(area.Name, area.Group, area.Geodata, ":9851")
+	geofence.SetFenceHook("", area.Name, area.Group, area.Geodata, "")
 
 	return c.Redirect(routes.Area.Index())
 }

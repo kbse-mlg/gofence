@@ -95,7 +95,7 @@ func doProcess(txn *gorp.Transaction, cd *ClientData) {
 		geofence.SetObject(cd.Name, cd.Group, cd.Lat, cd.Long)
 		geofence.Position(cd.Name, cd.Lat, cd.Long)
 	case geofence.SETHOOK:
-		geofence.SetFenceHook(cd.Name, cd.Group, cd.Geojson, ":6379")
+		geofence.SetFenceHook("", cd.Name, cd.Group, cd.Geojson, ":6379")
 	case geofence.DELHOOK:
 		geofence.DeleteHook(cd.Name)
 	case geofence.STOPPED:

@@ -139,7 +139,8 @@
                 $.get("/api/v1/area", function (data) {
                     if (data && data.Areas) {
                         data.Areas.forEach(function (area) {
-                            // sm.sethook("fence." + area.name, area.group, area.geodata);
+                            //sm.sethook("fence." + area.name, area.group, area.geodata);
+                            // sm.sethook(area.name, area.group, area.geodata);
                             var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
                                 style: function (feature) {
                                     return { color: "red" };
