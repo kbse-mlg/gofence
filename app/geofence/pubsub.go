@@ -49,9 +49,7 @@ func newPool(address string) *redis.Pool {
 
 func initPubSub() {
 	redispool = newPool(":6379")
-	// tile38Pool = newPool(":9851")
-	tile38Conn, _ := redis.Dial("tcp", ":9851")
-	defer tile38Conn.Close()
+	tile38Pool = newPool(":9851")
 	for {
 		c := redispool.Get()
 		defer c.Close()
@@ -89,7 +87,7 @@ func initPubSub() {
 
 // SetObject set object name
 func SetObject(name, group string, lat, long float64) error {
-	c, _ := redis.Dial("tcp", ":9851")
+	c := tile38Pool.Get()
 	defer c.Close()
 	revel.TRACE.Printf("SET %s %s POINT %f %f", group, name, lat, long)
 	ret, err := c.Do("SET", group, name, "POINT", lat, long)
@@ -112,7 +110,7 @@ func SetFenceHook(prefix, name, group, geojson, redisAddress string) error {
 	}
 	pname := fmt.Sprintf("%s.%s", prefix, name)
 	//tile38 command
-	c, _ := redis.Dial("tcp", ":9851")
+	c := tile38Pool.Get()
 	defer c.Close()
 	revel.TRACE.Println("SET HOOK", group, geojson)
 	ret, err := c.Do("SETHOOK", pname, fmt.Sprintf(redisHookTemplate, redisAddress, pname), "WITHIN", group, "FENCE", "OBJECT", geojson)
@@ -126,7 +124,7 @@ func SetFenceHook(prefix, name, group, geojson, redisAddress string) error {
 
 // DelFenceHook delete webhook to redis
 func DelFenceHook(name string) error {
-	c, _ := redis.Dial("tcp", ":9851")
+	c := tile38Pool.Get()
 	defer c.Close()
 	ret, err := c.Do("DELHOOK", name)
 	if err != nil {
@@ -138,7 +136,7 @@ func DelFenceHook(name string) error {
 
 // DelAllHook delete all webhook to redis
 func DelAllHook() error {
-	c, _ := redis.Dial("tcp", ":9851")
+	c := tile38Pool.Get()
 	defer c.Close()
 	ret, err := c.Do("PDELHOOK", "*")
 	if err != nil {
