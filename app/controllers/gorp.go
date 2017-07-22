@@ -15,6 +15,7 @@ import (
 
 	"github.com/kbse-mlg/gofence/app/geofence"
 	"github.com/kbse-mlg/gofence/app/models"
+	"github.com/kbse-mlg/gofence/utility/types"
 )
 
 type Coord struct {
@@ -125,7 +126,6 @@ func InitDB() {
 
 	t = Dbm.AddTableWithName(models.MoveHistory{}, "MoveHistory").SetKeys(true, "HistoryID")
 	t.ColMap("Object").Transient = true
-
 	t = Dbm.AddTableWithName(models.Alert{}, "Alert").SetKeys(true, "ID")
 	setColumnSizes(t, map[string]int{
 		"Info": 100,
@@ -209,20 +209,21 @@ func InsertData() {
 		panic(err)
 	}
 
+	now := types.DateTime{Int64: time.Now().UnixNano(), Valid: true}
 	demoArea := &models.Area{0, "A1",
 		`{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"color":"red"},"geometry":{"type":"Polygon","coordinates":[[[101.67458295822144,3.1290962786081646],[101.67694330215454,3.127125114155911],[101.67750120162964,3.1273822227728822],[101.6785740852356,3.1284106566103684],[101.67887449264526,3.128796319039309],[101.67833805084227,3.129267684037543],[101.67923927307129,3.1302532647123797],[101.67709350585938,3.13222442328034],[101.67563438415527,3.130638926463226],[101.67522668838501,3.1299747311373816],[101.67458295822144,3.1290962786081646]]]}}]}`,
 		1,
 		"Truck",
 		false,
-		time.Now().UnixNano(),
-		time.Now().UnixNano()}
+		now,
+		now}
 	if err := Dbm.Insert(demoArea); err != nil {
 		panic(err)
 	}
 
 	objects := []*models.Object{
-		&models.Object{0, "Truck", "A1", 101.67458295822144, 3.1290962786081646, 1, time.Now().UnixNano(), time.Now().UnixNano()},
-		&models.Object{0, "Truck", "A2", 101.67478295822144, 3.1290962786081646, 1, time.Now().UnixNano(), time.Now().UnixNano()},
+		&models.Object{0, "Truck", "A1", 101.67458295822144, 3.1290962786081646, 1, now, now},
+		&models.Object{0, "Truck", "A2", 101.67478295822144, 3.1290962786081646, 1, now, now},
 	}
 
 	for _, obj := range objects {

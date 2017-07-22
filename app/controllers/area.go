@@ -11,6 +11,7 @@ import (
 	"github.com/kbse-mlg/gofence/app/models"
 	"github.com/kbse-mlg/gofence/app/modules/response"
 	"github.com/kbse-mlg/gofence/app/routes"
+	"github.com/kbse-mlg/gofence/utility/types"
 	"github.com/revel/revel"
 )
 
@@ -227,7 +228,7 @@ func (c Area) ConfirmNew() revel.Result {
 	name := c.Params.Form.Get("name")
 
 	fmt.Printf("---> new data geodata:%s\nGroup:%s\nName:%s\n", geodata, group, name)
-	now := time.Now().UnixNano()
+	now := types.DateTime{Int64: time.Now().UnixNano(), Valid: true}
 	area := models.Area{0, name, geodata, 1, group, true, now, now}
 
 	// fmt.Println(geodata, group, area)

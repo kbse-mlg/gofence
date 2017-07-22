@@ -103,6 +103,11 @@
         sm.init();
         layers = [];
         markers = {};
+
+        // newsticker 
+        var tpl = _.template('<li class="item <%=type%>>"><div class="data">' +
+            '<div class="time text-muted"><%=time%></div>' +
+            '<p><span class="text-info"><%=code%></span> <%=text%> </p></div></li>');
         var dm = {
             //attribute
             center: [3.1290962786081646, 101.67658295822144],
@@ -124,7 +129,7 @@
                 // HACK: solution, it must be after login then set tz value.
                 var d = new Date()
                 var n = d.getTimezoneOffset();
-                $.get("/api/v1/tz?tz="+n);
+                $.get("/api/v1/tz?tz=" + n);
                 L.tileLayer(this.urlTileLayer, {
                     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
                     maxZoom: 18,
@@ -143,7 +148,9 @@
                             // sm.sethook(area.name, area.group, area.geodata);
                             var gsonLayer = L.geoJSON(JSON.parse(area.geodata), {
                                 style: function (feature) {
-                                    return { color: "red" };
+                                    return {
+                                        color: "red"
+                                    };
                                 },
                             }).bindPopup(function (layer) {
                                 return self.geojson.feature.properties.description;
@@ -159,7 +166,8 @@
                 $.get("/api/v1/object", function (data) {
                     if (data && data.Objects) {
                         data.Objects.forEach(function (obj) {
-                            self.markers[obj.name] = L.marker([obj.lat, obj.long]).bindPopup(obj.name).addTo(self.markerGroup);
+                            self.markers[obj.name] = L.marker([obj.lat, obj.long]).bindPopup(
+                                obj.name).addTo(self.markerGroup);
                         });
                     }
                 });
@@ -197,14 +205,17 @@
             dm.updateLocation();
         };
 
-         sm.onStopped = function (data) {
+        sm.onStopped = function (data) {
             console.log(data);
+            // notify("Enter", txt, "success");
+            // addEvents(tl, date.key, txt, "success")
         };
 
         function debounce(fn, delay) {
             var timer = null;
             return function () {
-                var context = this, args = arguments;
+                var context = this,
+                    args = arguments;
                 clearTimeout(timer);
                 timer = setTimeout(function () {
                     fn.apply(context, args);
@@ -213,6 +224,17 @@
         }
         var timer = null;
         var code = "";
+
+        function addEvents(tpl, key, text, type) {
+            $("#latest_history").append(
+                tpl({
+                    type: type,
+                    time: new Date(),
+                    code: key,
+                    text: text
+                }));
+        }
+
         sm.onResult = function (result) {
             console.log(result);
             if (result.data) {
@@ -224,10 +246,27 @@
                 timer = setTimeout(function () {
                     console.log(data);
                     switch (data.detect) {
-                        case "enter": notify("Enter", data.key + " " + data.id + " enter geofence area", "success"); break;
-                        case "exit": notify("Exit", data.key + " " + data.id + " exit geofence area", "info"); break;
-                        case "outside":notify("Outside", data.key +" "+data.id+" outside geofence area", "warning");break;
-                        case "inside":notify("Inside", data.key +" "+data.id+" inside geofence area", "warning");break;
+                        case "enter":
+                            var txt = data.key + " " + data.id + " enter geofence area";
+                            notify("Enter", txt, "success");
+                            addEvents(tl, data.key, txt, "success")
+                            break;
+                        case "exit":
+                            var txt = data.key + " " + data.id + " exit geofence area";
+                            notify("Exit", txt, "danger");
+                            addEvents(tl, data.key, txt, "danger");
+                            break;
+                        // case "outside":
+                        //     var txt = data.key + " " + data.id + " outside geofence area"
+                        //     notify("Outside", txt,
+                        //         "warning");
+                        //         addEvents(tl, data.key, txt, "warning")
+                        //     break;
+                        // case "inside":
+                        //     var txt = data.key + " " + data.id + " inside geofence area";
+                        //     notify("Inside", txt,
+                        //         "warning");
+                        //     break;
                     }
                 }, 900);
             }
@@ -247,27 +286,23 @@
             dm.setCenter(target.attr("lat"), target.attr("long"), target.attr("name"));
         });
 
-        // newsticker 
-        var tpl = _.template('<li class="item success"><div class="data">'+
-                             '<div class="time text-muted"><%=time%></div>'+
-                            '<p><span class="text-info"><%=code%></span> <%=text%> </p></div></li>');
-       
+
         //get last n data history
-        function fetchDataHistory(page){
-            $.get("/api/v1/log?page="+page).done(function(data){
-                if(!data.MoveHistories){
+        function fetchDataHistory(page) {
+            $.get("/api/v1/log?page=" + page).done(function (data) {
+                if (!data.MoveHistories) {
                     return;
                 }
                 page = data.NextPage;
                 console.log(data);
-                data.MoveHistories.forEach(function(item){
+                data.MoveHistories.forEach(function (item) {
                     console.log(item);
                     $("#latest_history").append(
-                    tpl({
-                        time:item.created,
-                        code:item.id,
-                        text:"long: "+item.long+" lat:"+item.lat
-                    }));
+                        tpl({
+                            time: item.created,
+                            code: item.id,
+                            text: "long: " + item.long + " lat:" + item.lat
+                        }));
                 })
             })
         }
@@ -295,6 +330,5 @@
         //     })
         // }, 5000);
     });
-
 </script>
 {{template "footer.html" .}}

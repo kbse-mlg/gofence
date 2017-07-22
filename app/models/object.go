@@ -11,14 +11,14 @@ import (
 )
 
 type Object struct {
-	ObjectID int     `json:"id"`
-	Group    string  `json:"group"`
-	Name     string  `json:"name"`
-	Long     float64 `json:"long"`
-	Lat      float64 `json:"lat"`
-	Type     int     `json:"type"`
-	Created  int64   `json:"created"`
-	Modified int64   `json:"modified"`
+	ObjectID int            `json:"id"`
+	Group    string         `json:"group"`
+	Name     string         `json:"name"`
+	Long     float64        `json:"long"`
+	Lat      float64        `json:"lat"`
+	Type     int            `json:"type"`
+	Created  types.DateTime `json:"created"`
+	Modified types.DateTime `json:"modified"`
 }
 
 func (u *Object) String() string {
@@ -43,13 +43,13 @@ func (obj *Object) PostUpdate(exe gorp.SqlExecutor) error {
 }
 
 func (obj *Object) PreInsert(_ gorp.SqlExecutor) error {
-	obj.Created = time.Now().UnixNano()
+	obj.Created = types.DateTime{Int64: time.Now().UnixNano(), Valid: true}
 	obj.Modified = obj.Created
 	return nil
 }
 
 func (obj *Object) PreUpdate(_ gorp.SqlExecutor) error {
-	obj.Modified = time.Now().UnixNano()
+	obj.Modified = types.DateTime{Int64: time.Now().UnixNano(), Valid: true}
 	return nil
 }
 

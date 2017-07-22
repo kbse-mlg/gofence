@@ -78,12 +78,12 @@ func (c WebSocket) Geofence(name string, ws *websocket.Conn) revel.Result {
 				// put error message
 			}
 			doProcess(c.Txn, &m)
-			// case cd, ok := <-newInternalWS:
-			// 	revel.TRACE.Println("-->", cd, ok)
-			// 	if !ok {
-			// 		return nil
-			// 	}
-			// 	doProcess(c.Txn, &cd)
+		case cd, ok := <-newInternalWS:
+			revel.TRACE.Println("-->", cd, ok)
+			if !ok {
+				return nil
+			}
+			doProcess(c.Txn, &cd)
 		}
 	}
 }

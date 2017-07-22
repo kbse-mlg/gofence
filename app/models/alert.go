@@ -23,3 +23,7 @@ type Alert struct {
 func (u *Alert) String() string {
 	return fmt.Sprintf("Alert(%s)", u.Level)
 }
+
+func NewAlert(level int, info string) Alert {
+	return Alert{Level: level, Info: info}
+}
