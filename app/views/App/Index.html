@@ -99,15 +99,16 @@
     crossorigin=""></script>
 <script type='text/javascript'>
     $(document).ready(function () {
+        var feedsCount = 0;
         var sm = socketManager();
         sm.init();
         layers = [];
         markers = {};
 
         // newsticker 
-        var tpl = _.template('<li class="item <%=type%>>"><div class="data">' +
+        var tpl = _.template('<li class="item <%=type%>"><div class="data">' +
             '<div class="time text-muted"><%=time%></div>' +
-            '<p><span class="text-info"><%=code%></span> <%=text%> </p></div></li>');
+            '<p><span class="text-<%=type%>"><%=code%></span> <%=text%> </p></div></li>');
         var dm = {
             //attribute
             center: [3.1290962786081646, 101.67658295822144],
@@ -207,8 +208,9 @@
 
         sm.onStopped = function (data) {
             console.log(data);
-            // notify("Enter", txt, "success");
-            // addEvents(tl, date.key, txt, "success")
+            var txt = data.type+" " +data.name + " has been stopped more than 10 minutes";
+            notify("STOPPED", txt, "danger");
+            addEvents(tpl, "STOPPED", txt, "danger")
         };
 
         function debounce(fn, delay) {
@@ -226,6 +228,10 @@
         var code = "";
 
         function addEvents(tpl, key, text, type) {
+            if(feedsCount==0){
+                $("#latest_history").empty();    
+            }
+            feedsCount++;
             $("#latest_history").append(
                 tpl({
                     type: type,
@@ -249,24 +255,25 @@
                         case "enter":
                             var txt = data.key + " " + data.id + " enter geofence area";
                             notify("Enter", txt, "success");
-                            addEvents(tl, data.key, txt, "success")
+                            addEvents(tpl, "ENTER", txt, "success")
                             break;
                         case "exit":
                             var txt = data.key + " " + data.id + " exit geofence area";
                             notify("Exit", txt, "danger");
-                            addEvents(tl, data.key, txt, "danger");
+                            addEvents(tpl, "EXIT", txt, "danger");
                             break;
-                        // case "outside":
-                        //     var txt = data.key + " " + data.id + " outside geofence area"
-                        //     notify("Outside", txt,
-                        //         "warning");
-                        //         addEvents(tl, data.key, txt, "warning")
-                        //     break;
-                        // case "inside":
-                        //     var txt = data.key + " " + data.id + " inside geofence area";
-                        //     notify("Inside", txt,
-                        //         "warning");
-                        //     break;
+                        case "outside":
+                            var txt = data.key + " " + data.id + " outside geofence area"
+                            notify("Outside", txt,
+                                "warning");
+                                addEvents(tpl, "OUTSIDE", txt, "info");
+                            break;
+                        case "inside":
+                            var txt = data.key + " " + data.id + " inside geofence area";
+                            notify("Inside", txt,
+                                "warning");
+                            addEvents(tpl, "INSIDE", txt, "info");
+                            break;
                     }
                 }, 900);
             }
