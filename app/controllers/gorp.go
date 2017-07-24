@@ -140,7 +140,7 @@ func InitDB() {
 	quit := make(chan struct{})
 	counter := 0
 
-	var a1, a2 *models.Object
+	var a1, a2, a3 *models.Object
 	max := len(Route)
 	fmt.Println("--->", max, a1, a2)
 
@@ -177,10 +177,20 @@ func InitDB() {
 					}
 				}
 
+				if a3 == nil {
+					af3, err := txn.Get(models.Object{}, 3)
+					if err == nil {
+						a3 = af3.(*models.Object)
+					}
+				}
+
 				a1.Lat = c1.Lat
 				a1.Long = c1.Long
 				a2.Lat = c2.Lat
 				a2.Long = c2.Long
+				a3.Lat = 3.1290962786081646
+				a3.Long = 101.67458295822144
+				checkStopped(a3, a3, a3.Name)
 
 				txn.Update(a1)
 				txn.Update(a2)
@@ -190,8 +200,10 @@ func InitDB() {
 				}
 				geofence.SetObject("A1", "Truck", c1.Lat, c1.Long)
 				geofence.SetObject("A2", "Truck", c2.Lat, c2.Long)
+				geofence.SetObject("A3", "Truck", 3.1290962786081646, 101.67458295822144)
 				geofence.Position("A1", c1.Lat, c1.Long)
 				geofence.Position("A2", c2.Lat, c2.Long)
+				geofence.Position("A3", 3.1290962786081646, 101.67458295822144)
 			case <-quit:
 				fmt.Println("----stopped")
 				ticker.Stop()
@@ -224,6 +236,7 @@ func InsertData() {
 	objects := []*models.Object{
 		&models.Object{0, "Truck", "A1", 101.67458295822144, 3.1290962786081646, 1, now, now},
 		&models.Object{0, "Truck", "A2", 101.67478295822144, 3.1290962786081646, 1, now, now},
+		&models.Object{0, "Truck", "A3", 101.67478295822144, 3.1290962786081646, 1, now, now},
 	}
 
 	for _, obj := range objects {

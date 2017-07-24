@@ -116,6 +116,7 @@ func checkStopped(obj1, obj2 *models.Object, name string) {
 		if now >= ts {
 			revel.TRACE.Println("---------> Stoped 10 minutes")
 			SendStoppedEvent(name, obj1.Lat, obj1.Long)
+			geofence.SetTsObject(name)
 		}
 	} else {
 		geofence.SetTsObject(name)
