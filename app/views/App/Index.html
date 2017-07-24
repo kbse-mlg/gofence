@@ -262,18 +262,18 @@
                             notify("Exit", txt, "danger");
                             addEvents(tpl, "EXIT", txt, "danger");
                             break;
-                        case "outside":
-                            var txt = data.key + " " + data.id + " outside geofence area"
-                            notify("Outside", txt,
-                                "warning");
-                                addEvents(tpl, "OUTSIDE", txt, "info");
-                            break;
-                        case "inside":
-                            var txt = data.key + " " + data.id + " inside geofence area";
-                            notify("Inside", txt,
-                                "warning");
-                            addEvents(tpl, "INSIDE", txt, "info");
-                            break;
+                        // case "outside":
+                        //     var txt = data.key + " " + data.id + " outside geofence area"
+                        //     notify("Outside", txt,
+                        //         "warning");
+                        //         addEvents(tpl, "OUTSIDE", txt, "info");
+                        //     break;
+                        // case "inside":
+                        //     var txt = data.key + " " + data.id + " inside geofence area";
+                        //     notify("Inside", txt,
+                        //         "warning");
+                        //     addEvents(tpl, "INSIDE", txt, "info");
+                        //     break;
                     }
                 }, 900);
             }
