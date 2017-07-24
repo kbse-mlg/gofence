@@ -111,8 +111,8 @@
             '<p><span class="text-<%=type%>"><%=code%></span> <%=text%> </p></div></li>');
         var dm = {
             //attribute
-            center: [3.1290962786081646, 101.67658295822144],
-            zoom: 17,
+            center: [2.7506746376610627, 101.71339318156245],
+            zoom: 15,
             id: "gmapid",
             map: null,
             geojson: [],
@@ -251,14 +251,15 @@
 
                 timer = setTimeout(function () {
                     console.log(data);
+                    var areaName = result.name.substring(6, result.name.length)
                     switch (data.detect) {
                         case "enter":
-                            var txt = data.key + " " + data.id + " enter geofence area";
+                            var txt = data.key + " " + data.id + " enter geofence area "+ areaName;
                             notify("Enter", txt, "success");
                             addEvents(tpl, "ENTER", txt, "success")
                             break;
                         case "exit":
-                            var txt = data.key + " " + data.id + " exit geofence area";
+                            var txt = data.key + " " + data.id + " exit geofence area"+areaName;
                             notify("Exit", txt, "error");
                             addEvents(tpl, "EXIT", txt, "danger");
                             break;
