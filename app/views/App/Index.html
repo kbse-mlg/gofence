@@ -209,7 +209,7 @@
         sm.onStopped = function (data) {
             console.log(data);
             var txt = data.type+" " +data.name + " has been stopped more than 10 minutes";
-            notify("STOPPED", txt, "danger");
+            notify("STOPPED", txt, "error");
             addEvents(tpl, "STOPPED", txt, "danger")
         };
 
@@ -259,7 +259,7 @@
                             break;
                         case "exit":
                             var txt = data.key + " " + data.id + " exit geofence area";
-                            notify("Exit", txt, "danger");
+                            notify("Exit", txt, "error");
                             addEvents(tpl, "EXIT", txt, "danger");
                             break;
                         // case "outside":
