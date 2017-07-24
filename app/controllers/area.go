@@ -231,6 +231,14 @@ func (c Area) ConfirmNew() revel.Result {
 	now := types.DateTime{Int64: time.Now().UnixNano(), Valid: true}
 	area := models.Area{0, name, geodata, 1, group, true, now, now}
 
+	area.Validate(c.Validation)
+
+	if c.Validation.HasErrors() {
+		c.Validation.Keep()
+		c.FlashParams()
+		return c.Redirect(routes.Area.New)
+	}
+
 	// fmt.Println(geodata, group, area)
 	err := c.Txn.Insert(&area)
 	if err != nil {
