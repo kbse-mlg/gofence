@@ -208,7 +208,7 @@
 
         sm.onStopped = function (data) {
             console.log(data);
-            var txt = data.type+" " +data.name + " has been stopped more than 10 minutes";
+            var txt = data.type+" " +data.name + " has been stopped more than 1 minutes";
             notify("STOPPED", txt, "error");
             addEvents(tpl, "STOPPED", txt, "danger")
         };
