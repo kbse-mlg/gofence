@@ -111,8 +111,9 @@ func checkStopped(obj1, obj2 *models.Object, name string) {
 	}
 
 	if ts, err := geofence.GetTsObject(name); err == nil {
-		// TODO: update config time
-		now := time.Now().Add(time.Minute * (-1)).UnixNano()
+		// stopped time
+		stopped := revel.Config.IntDefault("app.map.stoppedtime", 1)
+		now := time.Now().Add(time.Minute * (time.Duration(stopped))).UnixNano()
 		revel.TRACE.Println("========> ts vs now ", ts, now)
 		if now >= ts {
 			revel.TRACE.Println("---------> Stoped 1 minutes")
